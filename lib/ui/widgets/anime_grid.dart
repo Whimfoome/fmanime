@@ -4,6 +4,7 @@ import 'package:fmanime/services/parser/basic_parser.dart';
 import 'package:fmanime/ui/widgets/loading_switcher.dart';
 import 'package:fmanime/ui/widgets/anime_card.dart';
 import 'dart:math';
+import 'package:fmanime/utils/constants.dart';
 
 class AnimeGrid extends StatefulWidget {
   const AnimeGrid({
@@ -61,10 +62,8 @@ class _AnimeGridState extends State<AnimeGrid> {
 
     bool isSearch = widget.url?.startsWith('/search') ?? false;
     // For search, you need to use &
-    final link = 'https://www26.gogoanimes.tv/' +
-        widget.url! +
-        (isSearch ? '&' : '?') +
-        'page=$page';
+    final link =
+        '$defaultDomain${widget.url!}${isSearch ? '&' : '?'}page=$page';
     print('Current link is $link');
     final parser = AnimeParser(link);
     parser.downloadHTML().then((body) {
