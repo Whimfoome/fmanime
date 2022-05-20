@@ -1,42 +1,15 @@
-import 'package:html/dom.dart' as dom;
-
-/// It has the info needed by AnimeGrid, it can either be `latest episode` or `an anime`
-class AnimeInfo extends BasicAnime {
+class AnimeInfo {
+  String? name;
+  String? link;
   String? coverImage;
 
   // Either episode or release
   String? episode = '??';
   bool isDUB = false;
 
-  AnimeInfo(dom.Element e) : super.fromJson(null) {
-    // Image class has image and also name, link but I will use name class instead
-    final imageClass = e.getElementsByClassName('img').first;
-    coverImage = imageClass.nodes[1].nodes[1].attributes['src'];
+  AnimeInfo();
 
-    // In order to call isCategory(), link needs to be parsed first
-    final nameClass = e.getElementsByClassName('name').first;
-    final nameLink = nameClass.firstChild;
-    name = nameLink?.attributes['title']?.trim();
-    link = nameLink?.attributes['href'];
-
-    // Category has a released class while episode only has the episode
-    final releaseClass = e.getElementsByClassName('released').first;
-    episode = releaseClass.nodes[0].text?.trim().replaceAll('Released: ', '');
-  }
-
-  /// Returns either episode or the name of name
-  String? getTitle() {
-    return name;
-  }
-}
-
-class BasicAnime {
-  String? name;
-  String? link;
-
-  BasicAnime(this.name, this.link);
-
-  BasicAnime.fromJson(Map<String, dynamic>? json) {
+  AnimeInfo.fromJson(Map<String, dynamic>? json) {
     if (json == null) return;
     name = json['name'];
     link = json['link'];
@@ -53,4 +26,6 @@ class BasicAnime {
   String toString() {
     return 'name: $name, link: $link';
   }
+
+  String? getTitle() => name;
 }
