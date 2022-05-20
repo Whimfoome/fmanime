@@ -17,7 +17,7 @@ class _DiscoverState extends State<Discover> {
         future: init(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return const AnimeGrid(
+            return const GridLibrary(
               url: "/popular.html",
             );
           } else {
@@ -27,7 +27,7 @@ class _DiscoverState extends State<Discover> {
   }
 
   Future<bool> init() async {
-    await DomainParser(defaultDomain).getNewDomain();
+    await Parser().getAnimeDomain();
     return true;
   }
 }
