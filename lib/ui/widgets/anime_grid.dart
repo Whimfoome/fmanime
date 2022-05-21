@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/anime_info.dart';
 import 'package:fmanime/services/parser/gogoanime_parser.dart';
-import 'package:fmanime/ui/widgets/anime_card.dart';
 
 class GridLibrary extends StatefulWidget {
   const GridLibrary({Key? key, required this.url}) : super(key: key);
@@ -37,19 +36,7 @@ class _GridLibraryState extends State<GridLibrary> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: ((context, constraints) {
       if (items.isNotEmpty) {
-        return ListView.separated(
-            controller: _scrollController,
-            itemBuilder: ((context, index) {
-              return ListTile(
-                title: Text(items[index].name!),
-              );
-            }),
-            separatorBuilder: (context, index) {
-              return const Divider(
-                height: 1,
-              );
-            },
-            itemCount: items.length);
+        return buildGrid();
       } else {
         return const Center(
           child: CircularProgressIndicator(),
@@ -62,6 +49,53 @@ class _GridLibraryState extends State<GridLibrary> {
   void dispose() {
     super.dispose();
     _scrollController.dispose();
+  }
+
+  GridView buildGrid() {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 5,
+      ),
+      padding: const EdgeInsets.all(5),
+      itemBuilder: ((context, index) {
+        final item = items[index];
+
+        return buildGridTile(item);
+      }),
+      itemCount: items.length,
+    );
+  }
+
+  GridTile buildGridTile(AnimeInfo item) {
+    return GridTile(
+      footer: Text(
+        item.name!,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          shadows: <Shadow>[
+            Shadow(
+              blurRadius: 15.0,
+              color: Colors.black,
+            ),
+          ],
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          image: item.coverImage != null
+              ? DecorationImage(
+                  image: NetworkImage(item.coverImage!),
+                  fit: BoxFit.cover,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
   }
 
   getPopularAnime() async {
