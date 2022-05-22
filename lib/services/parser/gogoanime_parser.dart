@@ -1,7 +1,7 @@
-import 'package:http/http.dart' as http;
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart';
-import 'package:fmanime/models/anime_info.dart';
+import "package:http/http.dart" as http;
+import "package:html/dom.dart" as dom;
+import "package:html/parser.dart";
+import "package:fmanime/models/anime_info.dart";
 
 class GogoanimeParser {
   GogoanimeParser();
@@ -63,10 +63,6 @@ class GogoanimeParser {
     final nameLink = nameClass.firstChild;
     animeInfo.name = nameLink?.attributes['title']?.trim();
     animeInfo.link = nameLink?.attributes['href'];
-
-    final releaseClass = element.getElementsByClassName('released').first;
-    animeInfo.episode =
-        releaseClass.nodes[0].text?.trim().replaceAll('Released: ', '');
 
     return animeInfo;
   }

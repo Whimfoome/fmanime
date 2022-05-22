@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:fmanime/models/anime_info.dart';
-import 'package:fmanime/services/parser/gogoanime_parser.dart';
+import "package:flutter/material.dart";
+import "package:fmanime/models/anime_info.dart";
+import "package:fmanime/services/parser/gogoanime_parser.dart";
+import "package:fmanime/ui/pages/anime_detail.dart";
 
 class GridLibrary extends StatefulWidget {
   const GridLibrary({Key? key, required this.url}) : super(key: key);
@@ -53,6 +54,7 @@ class _GridLibraryState extends State<GridLibrary> {
 
   GridView buildGrid() {
     return GridView.builder(
+      controller: _scrollController,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.7,
@@ -69,31 +71,46 @@ class _GridLibraryState extends State<GridLibrary> {
     );
   }
 
-  GridTile buildGridTile(AnimeInfo item) {
-    return GridTile(
-      footer: Text(
-        item.name!,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          shadows: <Shadow>[
-            Shadow(
-              blurRadius: 15.0,
-              color: Colors.black,
+  Widget buildGridTile(AnimeInfo item) {
+    // Workaround for Ink bleeding through IndexedStack
+    // (https://github.com/flutter/flutter/issues/59963)
+    return Material(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        child: GridTile(
+          footer: Text(
+            item.name!,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              shadows: <Shadow>[
+                Shadow(
+                  blurRadius: 15.0,
+                  color: Colors.black,
+                ),
+              ],
             ),
-          ],
+          ),
+          child: Ink(
+            decoration: BoxDecoration(
+              image: item.coverImage != null
+                  ? DecorationImage(
+                      image: NetworkImage(item.coverImage!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
         ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          image: item.coverImage != null
-              ? DecorationImage(
-                  image: NetworkImage(item.coverImage!),
-                  fit: BoxFit.cover,
-                )
-              : null,
-          borderRadius: BorderRadius.circular(12),
-        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AnimeDetailPage(info: item),
+            ),
+          );
+        },
       ),
     );
   }

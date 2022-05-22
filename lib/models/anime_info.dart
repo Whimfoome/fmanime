@@ -3,10 +3,6 @@ class AnimeInfo {
   String? link;
   String? coverImage;
 
-  // Either episode or release
-  String? episode = '??';
-  bool isDUB = false;
-
   AnimeInfo();
 
   AnimeInfo.fromJson(Map<String, dynamic>? json) {

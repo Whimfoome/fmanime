@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:fmanime/ui/pages/anime_discover.dart';
+import "package:flutter/material.dart";
+import "package:fmanime/ui/pages/anime_discover.dart";
 
 void main() {
   runApp(const MyApp());
