@@ -123,7 +123,7 @@ class _GridLibraryState extends State<GridLibrary> {
       loading = true;
     });
 
-    await GogoanimeParser().fetchData(widget.url, page).then((value) {
+    await GogoanimeParser().getMainData(widget.url, page).then((value) {
       final newData = value;
 
       if (newData != null) {

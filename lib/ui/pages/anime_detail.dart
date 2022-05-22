@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
-import 'package:fmanime/models/anime_info.dart';
+import "package:fmanime/models/anime_info.dart";
+import "package:fmanime/services/parser/gogoanime_parser.dart";
 
 class AnimeDetailPage extends StatefulWidget {
   const AnimeDetailPage({Key? key, required this.info}) : super(key: key);
@@ -11,6 +12,15 @@ class AnimeDetailPage extends StatefulWidget {
 }
 
 class _AnimeDetailPageState extends State<AnimeDetailPage> {
+  AnimeInfo? info = null;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getDescription();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +40,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
               Expanded(child: Text(widget.info.name!)),
             ],
           ),
-          Text("Description"),
+          Text(info!.description ?? "Loading..."),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -42,4 +52,29 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
       ),
     );
   }
+
+  Future<AnimeInfo?> getDescription() async {
+    await GogoanimeParser().getDetailsData(widget.info).then((value) {
+      final newData = value;
+
+      if (newData != null) {
+        info = newData;
+      }
+
+      return newData;
+    });
+  }
+
+  // @override
+  // Future<void> initState() {
+  //   super.initState();
+
+  //   await GogoanimeParser().getDetailsData(widget.info).then((value) {
+  //     final newData = value;
+
+  //     if (newData != null) {
+  //       info = newData;
+  //     }
+  //   });
+  // }
 }
