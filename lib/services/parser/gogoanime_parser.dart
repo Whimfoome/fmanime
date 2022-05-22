@@ -40,7 +40,7 @@ class GogoanimeParser {
     return parsedData;
   }
 
-  AnimeInfo? getDetailsData(AnimeInfo info) {
+  Future<AnimeInfo?> getDetailsData(AnimeInfo info) {
     _link = domain + (info.link ?? "");
 
     final parsedData = downloadHTML().then((body) {

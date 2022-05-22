@@ -2,7 +2,7 @@ class AnimeInfo {
   String? name;
   String? link;
   String? coverImage;
-  String? description;
+  String? description = "Description";
 
   List<Episode> episodes = [];
 

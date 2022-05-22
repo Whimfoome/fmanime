@@ -12,13 +12,21 @@ class AnimeDetailPage extends StatefulWidget {
 }
 
 class _AnimeDetailPageState extends State<AnimeDetailPage> {
-  AnimeInfo? info = null;
+  late AnimeInfo info;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getDescription();
+
+    info = widget.info;
+
+    GogoanimeParser().getDetailsData(info).then((value) {
+      if (value != null) {
+        setState(() {
+          info = value;
+        });
+      }
+    });
   }
 
   @override
@@ -32,15 +40,15 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Image.network(
-                widget.info.coverImage!,
+                info.coverImage!,
                 width: 100,
                 height: 100,
                 fit: BoxFit.cover,
               ),
-              Expanded(child: Text(widget.info.name!)),
+              Expanded(child: Text(info.name!)),
             ],
           ),
-          Text(info!.description ?? "Loading..."),
+          Text(info.description!),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -52,29 +60,4 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
       ),
     );
   }
-
-  Future<AnimeInfo?> getDescription() async {
-    await GogoanimeParser().getDetailsData(widget.info).then((value) {
-      final newData = value;
-
-      if (newData != null) {
-        info = newData;
-      }
-
-      return newData;
-    });
-  }
-
-  // @override
-  // Future<void> initState() {
-  //   super.initState();
-
-  //   await GogoanimeParser().getDetailsData(widget.info).then((value) {
-  //     final newData = value;
-
-  //     if (newData != null) {
-  //       info = newData;
-  //     }
-  //   });
-  // }
 }
