@@ -59,7 +59,7 @@ class _GridLibraryState extends State<GridLibrary> {
         crossAxisCount: 2,
         childAspectRatio: 0.7,
         mainAxisSpacing: 10,
-        crossAxisSpacing: 5,
+        crossAxisSpacing: 10,
       ),
       padding: const EdgeInsets.all(5),
       itemBuilder: ((context, index) {
@@ -78,17 +78,28 @@ class _GridLibraryState extends State<GridLibrary> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         child: GridTile(
-          footer: Text(
-            item.name!,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              shadows: <Shadow>[
-                Shadow(
-                  blurRadius: 15.0,
-                  color: Colors.black,
-                ),
-              ],
+          footer: Container(
+            margin: const EdgeInsets.all(6),
+            child: Text(
+              item.name!,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                shadows: <Shadow>[
+                  Shadow(
+                    blurRadius: 12.0,
+                    color: Colors.black,
+                  ),
+                  Shadow(
+                    offset: Offset(0, 2),
+                    blurRadius: 20.0,
+                    color: Colors.black,
+                  ),
+                ],
+              ),
             ),
           ),
           child: Ink(
@@ -115,7 +126,7 @@ class _GridLibraryState extends State<GridLibrary> {
     );
   }
 
-  getPopularAnime() async {
+  getPopularAnime() {
     if (allLoaded) {
       return;
     }
@@ -123,7 +134,7 @@ class _GridLibraryState extends State<GridLibrary> {
       loading = true;
     });
 
-    await GogoanimeParser().getMainData(widget.url, page).then((value) {
+    GogoanimeParser().getMainData(widget.url, page).then((value) {
       final newData = value;
 
       if (newData != null) {

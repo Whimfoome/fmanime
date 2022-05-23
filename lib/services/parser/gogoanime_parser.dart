@@ -41,7 +41,7 @@ class GogoanimeParser {
   }
 
   Future<AnimeInfo?> getDetailsData(AnimeInfo info) {
-    _link = domain + (info.link ?? "");
+    _link = domain + (info.link ?? '');
 
     final parsedData = downloadHTML().then((body) {
       return parseDetails(info, body);
