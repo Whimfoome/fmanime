@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:fmanime/ui/pages/anime_discover.dart';
+import "package:flutter/material.dart";
+import "package:fmanime/ui/pages/anime_discover.dart";
 
 void main() {
   runApp(const MyApp());
@@ -11,10 +11,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Fmanime",
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
       ),
+      themeMode: ThemeMode.dark,
       home: const NavBar(title: "Fmanime"),
     );
   }

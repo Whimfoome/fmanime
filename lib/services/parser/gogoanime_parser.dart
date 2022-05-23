@@ -1,7 +1,7 @@
-import 'package:http/http.dart' as http;
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart';
-import 'package:fmanime/models/anime_info.dart';
+import "package:http/http.dart" as http;
+import "package:html/dom.dart" as dom;
+import "package:html/parser.dart";
+import "package:fmanime/models/anime_info.dart";
 
 class GogoanimeParser {
   GogoanimeParser();
@@ -28,7 +28,29 @@ class GogoanimeParser {
     }
   }
 
-  List<AnimeInfo> parseHTML(dom.Document? body) {
+  Future<List<AnimeInfo>?> getMainData(String? url, int page) async {
+    bool isSearch = url?.startsWith("/search") ?? false;
+
+    _link = "$domain${url!}${isSearch ? '&' : '?'}page=$page";
+
+    final parsedData = downloadHTML().then((body) {
+      return parseMain(body);
+    });
+
+    return parsedData;
+  }
+
+  Future<AnimeInfo?> getDetailsData(AnimeInfo info) {
+    _link = domain + (info.link ?? '');
+
+    final parsedData = downloadHTML().then((body) {
+      return parseDetails(info, body);
+    });
+
+    return parsedData;
+  }
+
+  List<AnimeInfo> parseMain(dom.Document? body) {
     List<AnimeInfo> list = [];
 
     if (body != null) {
@@ -42,7 +64,7 @@ class GogoanimeParser {
             for (var element in items.nodes) {
               // Only parse elements, no Text
               if (element is dom.Element) {
-                list.add(buildAnimeInfo(element));
+                list.add(getMainAnimeInfo(element));
               }
             }
           }
@@ -53,7 +75,17 @@ class GogoanimeParser {
     return list;
   }
 
-  AnimeInfo buildAnimeInfo(dom.Element element) {
+  AnimeInfo parseDetails(AnimeInfo info, dom.Document? body) {
+    AnimeInfo newInfo = info;
+
+    final infoClass = body?.getElementsByClassName("anime_info_body_bg").first;
+
+    newInfo.description = infoClass?.nodes[9].nodes[1].text?.trimRight();
+
+    return newInfo;
+  }
+
+  AnimeInfo getMainAnimeInfo(dom.Element element) {
     AnimeInfo animeInfo = AnimeInfo();
 
     final imageClass = element.getElementsByClassName('img').first;
@@ -64,22 +96,16 @@ class GogoanimeParser {
     animeInfo.name = nameLink?.attributes['title']?.trim();
     animeInfo.link = nameLink?.attributes['href'];
 
-    final releaseClass = element.getElementsByClassName('released').first;
-    animeInfo.episode =
-        releaseClass.nodes[0].text?.trim().replaceAll('Released: ', '');
-
     return animeInfo;
   }
+}
 
-  Future<List<AnimeInfo>?> fetchData(String? url, int page) async {
-    bool isSearch = url?.startsWith("/search") ?? false;
+class EpisodeSection {
+  String? episodeStart;
+  String? episodeEnd;
+  String? movieId;
 
-    _link = "$domain${url!}${isSearch ? '&' : '?'}page=$page";
+  EpisodeSection();
 
-    final parsedData = downloadHTML().then((body) {
-      return parseHTML(body);
-    });
-
-    return parsedData;
-  }
+  String getLink() => "?ep_start=$episodeStart&ep_end=$episodeEnd&id=$movieId";
 }

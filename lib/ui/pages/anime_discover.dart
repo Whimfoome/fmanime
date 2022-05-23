@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:fmanime/ui/widgets/anime_grid.dart';
+import "package:flutter/material.dart";
+import "package:fmanime/ui/widgets/anime_grid.dart";
 
 class Discover extends StatefulWidget {
   const Discover({Key? key}) : super(key: key);
