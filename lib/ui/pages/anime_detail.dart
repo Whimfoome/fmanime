@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import 'package:flutter/rendering.dart';
 import "package:fmanime/models/anime_info.dart";
 import "package:fmanime/services/parser/gogoanime_parser.dart";
 
@@ -21,7 +20,19 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
 
     info = widget.info;
 
-    GogoanimeParser().getDetailsData(info).then((value) {
+    showDetails();
+  }
+
+  Future showDetails() async {
+    await GogoanimeParser().getDetailsData(info).then((value) {
+      if (value != null) {
+        setState(() {
+          info = value;
+        });
+      }
+    });
+
+    GogoanimeParser().getEpisodesData(info).then((value) {
       if (value != null) {
         setState(() {
           info = value;
@@ -39,32 +50,42 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
         scrollDirection: Axis.vertical,
         children: [
           buildHeader(),
-          ListView(
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            padding: EdgeInsets.zero,
-            scrollDirection: Axis.vertical,
-            children: [
-              ListTile(title: Text("Episode 1")),
-              ListTile(title: Text("Episode 2")),
-              ListTile(title: Text("Episode 3")),
-              ListTile(title: Text("Episode 4")),
-              ListTile(title: Text("Episode 5")),
-              ListTile(title: Text("Episode 6")),
-              ListTile(title: Text("Episode 7")),
-              ListTile(title: Text("Episode 8")),
-              ListTile(title: Text("Episode 9")),
-              ListTile(title: Text("Episode 10")),
-              ListTile(title: Text("Episode 11")),
-              ListTile(title: Text("Episode 12")),
-              ListTile(title: Text("Episode 13")),
-              ListTile(title: Text("Episode 14")),
-              ListTile(title: Text("Episode 15")),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text(info.episodes.isNotEmpty
+                  ? "${info.episodes.length} episodes"
+                  : "Loading episodes..."),
+            ),
           ),
+          const Divider(
+            height: 1,
+          ),
+          buildEpisodes(),
         ],
       ),
     );
+  }
+
+  Widget buildEpisodes() {
+    if (info.episodes.isNotEmpty) {
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const ClampingScrollPhysics(),
+        padding: EdgeInsets.zero,
+        scrollDirection: Axis.vertical,
+        itemCount: info.episodes.length,
+        itemBuilder: ((context, index) {
+          return ListTile(
+            title: Text(info.episodes[index].name),
+          );
+        }),
+      );
+    } else {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 
   Widget buildHeader() {

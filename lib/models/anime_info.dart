@@ -1,4 +1,5 @@
 class AnimeInfo {
+  String? id;
   String? name;
   String? link;
   String? coverImage;
@@ -12,6 +13,8 @@ class AnimeInfo {
 }
 
 class Episode {
-  String? name;
-  String? link;
+  Episode({required this.link, required this.name});
+
+  String name;
+  String link;
 }
