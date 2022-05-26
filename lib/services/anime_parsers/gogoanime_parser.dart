@@ -1,6 +1,6 @@
 import "package:html/dom.dart" as dom;
 import "package:fmanime/models/anime_info.dart";
-import "package:fmanime/services/parser/html_helper.dart";
+import "package:fmanime/services/html_helper.dart";
 
 class GogoanimeParser {
   GogoanimeParser();
