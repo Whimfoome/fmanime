@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:fmanime/models/anime_info.dart";
 import "package:fmanime/services/anime_parsers/gogoanime_parser.dart";
+import "package:fmanime/ui/pages/anime_viewer.dart";
 
 class AnimeDetailPage extends StatefulWidget {
   const AnimeDetailPage({Key? key, required this.info}) : super(key: key);
@@ -78,6 +79,14 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
         itemBuilder: ((context, index) {
           return ListTile(
             title: Text(info.episodes[index].name),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AnimeViewer(episode: info.episodes[index]),
+                ),
+              );
+            },
           );
         }),
       );
