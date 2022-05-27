@@ -1,6 +1,6 @@
 import "package:html/dom.dart" as dom;
 import "package:fmanime/models/anime_info.dart";
-import "package:fmanime/services/parser/html_helper.dart";
+import "package:fmanime/services/html_helper.dart";
 
 class GogoanimeParser {
   GogoanimeParser();
@@ -99,6 +99,43 @@ class GogoanimeParser {
       info.episodes = fetchedEpisodes.reversed.toList();
 
       return info;
+    });
+  }
+
+  Future<Episode> getEpisodeViewerInfo(Episode episode) async {
+    final epLink = episode.link;
+    final link = domain + epLink;
+
+    return downloadHTML(link).then((body) {
+      final div = body?.getElementsByClassName("anime_video_body").first;
+
+      final server = div?.getElementsByClassName("anime_muti_link").first;
+      final serverList = server?.nodes[1];
+      if (serverList != null) {
+        for (var element in serverList.nodes) {
+          if (element.runtimeType == dom.Element) {
+            final elNode = element.nodes[1];
+
+            var link1 = elNode.attributes["data-video"] ?? '';
+            if (!link1.startsWith("http")) {
+              link1 = "https://$link1";
+            }
+
+            final title1 = elNode.nodes[0].text ?? '';
+            String? theTitle;
+            if (title1.trim().isEmpty) {
+              theTitle = elNode.nodes[2].text?.toUpperCase();
+            } else {
+              theTitle = title1.toUpperCase();
+            }
+
+            episode.videoServers
+                .add(VideoServer(title: theTitle!, link: link1));
+          }
+        }
+      }
+
+      return episode;
     });
   }
 

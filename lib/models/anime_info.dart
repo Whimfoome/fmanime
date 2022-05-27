@@ -17,4 +17,13 @@ class Episode {
 
   String name;
   String link;
+
+  List<VideoServer> videoServers = [];
+}
+
+class VideoServer {
+  String title;
+  String link;
+
+  VideoServer({required this.title, required this.link});
 }
