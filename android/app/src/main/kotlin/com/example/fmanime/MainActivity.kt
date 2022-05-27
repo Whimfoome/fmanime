@@ -1,4 +1,4 @@
-package com.example.fmanime
+package me.whimfoome.fmanime
 
 import io.flutter.embedding.android.FlutterActivity
 
