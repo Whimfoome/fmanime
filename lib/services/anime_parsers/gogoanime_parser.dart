@@ -4,9 +4,9 @@ import "package:fmanime/services/html_helper.dart";
 
 class GogoanimeParser {
   GogoanimeParser();
-  // domains: "https://www26.gogoanimes.tv/"
-  //          "https://gogoanimes.to/"
-  final String domain = "https://www26.gogoanimes.tv/";
+
+  final String domain = "https://gogoanime.gg/";
+  final String ajax = "https://ajax.gogo-load.com/ajax/";
 
   Future<List<AnimeInfo>?> getGridData(String? url, int page) async {
     bool isSearch = url?.startsWith("/search") ?? false;
@@ -17,20 +17,10 @@ class GogoanimeParser {
       List<AnimeInfo> list = [];
 
       if (body != null) {
-        final div = body.getElementsByClassName('items');
+        final listDiv = body.getElementsByClassName('items').first.children;
 
-        if (div.length == 1) {
-          final items = div.first;
-
-          if (items.text.contains('Sorry') || !items.hasChildNodes()) {
-            return null;
-          }
-
-          for (var element in items.nodes) {
-            if (element is dom.Element) {
-              list.add(getMainAnimeInfo(element));
-            }
-          }
+        for (var element in listDiv) {
+          list.add(getMainAnimeInfo(element));
         }
       }
 
@@ -46,14 +36,23 @@ class GogoanimeParser {
     final parsedData = downloadHTML(link).then((body) {
       AnimeInfo newInfo = info;
 
-      final infoClass =
-          body?.getElementsByClassName("anime_info_body_bg").first;
+      newInfo.description = body
+          ?.getElementsByClassName("anime_info_body_bg")
+          .first
+          .getElementsByClassName('type')[1]
+          .text
+          .trim()
+          .split('Plot Summary:')
+          .last;
 
-      newInfo.description = infoClass?.nodes[9].nodes[1].text?.trimRight();
-
-      final movieClass = body?.getElementById("movie_id");
-
-      newInfo.id = movieClass?.attributes["value"];
+      newInfo.id = body
+          ?.getElementsByClassName('anime_info_episodes_next')
+          .first
+          .getElementsByTagName('input')
+          .first
+          .attributes
+          .values
+          .elementAt(1);
 
       return newInfo;
     });
@@ -64,7 +63,7 @@ class GogoanimeParser {
   Future<AnimeInfo?> getEpisodesData(AnimeInfo info) {
     List<Episode> fetchedEpisodes = [];
     final link =
-        "${domain}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}";
+        "${ajax}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}";
 
     return downloadHTML(link).then((body) {
       final list =
@@ -142,13 +141,42 @@ class GogoanimeParser {
   AnimeInfo getMainAnimeInfo(dom.Element element) {
     AnimeInfo animeInfo = AnimeInfo();
 
-    final imageClass = element.getElementsByClassName('img').first;
-    animeInfo.coverImage = imageClass.nodes[1].nodes[1].attributes['src'];
+    final eImage = element
+        .getElementsByClassName('img')
+        .first
+        .getElementsByTagName('a')
+        .first
+        .getElementsByTagName('img')
+        .first
+        .attributes
+        .values
+        .first;
 
-    final nameClass = element.getElementsByClassName('name').first;
-    final nameLink = nameClass.firstChild;
-    animeInfo.name = nameLink?.attributes['title']?.trim();
-    animeInfo.link = nameLink?.attributes['href'];
+    final eAnimeUrl = element
+        .getElementsByClassName('name')
+        .first
+        .getElementsByTagName('a')
+        .first
+        .attributes
+        .values
+        .first;
+
+    final eName = element
+        .getElementsByClassName('name')
+        .first
+        .getElementsByTagName('a')
+        .first
+        .attributes
+        .values
+        .last;
+
+    final eReleaseDate =
+        element.getElementsByClassName('released').first.text.trim();
+
+    animeInfo.name = eName;
+    animeInfo.link = eAnimeUrl;
+    animeInfo.coverImage = eImage;
+    animeInfo.releaseDate = eReleaseDate;
 
     return animeInfo;
   }

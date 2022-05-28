@@ -4,6 +4,7 @@ class AnimeInfo {
   String? link;
   String? coverImage;
   String? description = "";
+  String? releaseDate;
 
   List<Episode> episodes = [];
 
