@@ -22,13 +22,13 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void initState() {
     super.initState();
-    getPopularAnime();
+    getAnime();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
           !loading) {
         page++;
-        getPopularAnime();
+        getAnime();
       }
     });
   }
@@ -126,7 +126,7 @@ class _GridLibraryState extends State<GridLibrary> {
     );
   }
 
-  getPopularAnime() {
+  getAnime() {
     if (allLoaded) {
       return;
     }
