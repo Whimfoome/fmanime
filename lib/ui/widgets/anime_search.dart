@@ -3,16 +3,17 @@ import "package:fmanime/models/anime_info.dart";
 import "package:fmanime/services/anime_parsers/gogoanime_parser.dart";
 import "package:fmanime/ui/pages/anime_detail.dart";
 
-class GridLibrary extends StatefulWidget {
-  const GridLibrary({Key? key, required this.url}) : super(key: key);
-
-  final String? url;
+class GridLibrarySearch extends StatefulWidget {
+  const GridLibrarySearch({Key? key}) : super(key: key);
 
   @override
-  State<GridLibrary> createState() => _GridLibraryState();
+  State<GridLibrarySearch> createState() => _GridLibrarySearchState();
 }
 
-class _GridLibraryState extends State<GridLibrary> {
+class _GridLibrarySearchState extends State<GridLibrarySearch> {
+  String search = '';
+  String formattedSearch = '';
+
   final ScrollController _scrollController = ScrollController();
   List<AnimeInfo> items = [];
   bool loading = false, allLoaded = false;
@@ -22,29 +23,49 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void initState() {
     super.initState();
-    getAnime();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
           !loading) {
         page++;
-        getAnime();
+        getPopularAnime();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    print("opa");
-    return LayoutBuilder(builder: ((context, constraints) {
-      if (items.isNotEmpty) {
-        return buildGrid();
-      } else {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
-    }));
+    return Scaffold(
+      appBar: AppBar(
+        title: TextField(
+          decoration: InputDecoration.collapsed(hintText: "Search"),
+          autocorrect: false,
+          autofocus: true,
+          onChanged: (t) {
+            search = t;
+            formattedSearch = '';
+          },
+          onEditingComplete: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+            setState(() {
+              formattedSearch = search.split(' ').join('%20');
+            });
+          },
+        ),
+      ),
+      body: LayoutBuilder(builder: ((context, constraints) {
+        if (formattedSearch.length > 3) {
+          getPopularAnime();
+        }
+        if (items.isNotEmpty) {
+          return buildGrid();
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      })),
+    );
   }
 
   @override
@@ -127,15 +148,18 @@ class _GridLibraryState extends State<GridLibrary> {
     );
   }
 
-  getAnime() {
+  getPopularAnime() {
     if (allLoaded) {
       return;
     }
-    setState(() {
-      loading = true;
-    });
+    // setState(() {
+    //   loading = true;
+    // });
 
-    GogoanimeParser().getGridData(widget.url, page).then((value) {
+    print("Hello!,");
+    GogoanimeParser()
+        .getGridData("/search.html?keyword=$formattedSearch", page)
+        .then((value) {
       final newData = value;
 
       if (newData != null) {
