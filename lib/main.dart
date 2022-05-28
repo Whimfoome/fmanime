@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
-import "package:fmanime/ui/pages/anime_discover.dart";
+import 'package:fmanime/ui/pages/anime_page.dart';
+import 'package:fmanime/ui/pages/manga_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,10 +33,10 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int currentIndex = 2;
+  int currentIndex = 0;
   final screens = [
-    const Discover(),
-    const Center(child: Text("Manga")),
+    const AnimePage(),
+    const MangaPage(),
     const Center(child: Text("Settings")),
   ];
 

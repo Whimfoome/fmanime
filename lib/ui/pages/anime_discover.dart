@@ -1,8 +1,15 @@
 import "package:flutter/material.dart";
 import "package:fmanime/ui/widgets/anime_grid.dart";
 
+enum ContentType {
+  anime,
+  manga,
+}
+
 class Discover extends StatefulWidget {
-  const Discover({Key? key}) : super(key: key);
+  const Discover({Key? key, required this.contentType}) : super(key: key);
+
+  final ContentType contentType;
 
   @override
   State<Discover> createState() => _DiscoverState();
@@ -23,17 +30,22 @@ class _DiscoverState extends State<Discover> {
           decoration: InputDecoration(
               hintText: "Search",
               border: InputBorder.none,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _searchController.clear();
-                  sendKey = true;
+              contentPadding: const EdgeInsets.symmetric(vertical: 15),
+              icon: const Icon(Icons.search),
+              suffixIcon: Visibility(
+                visible: search.isNotEmpty,
+                child: IconButton(
+                  onPressed: () {
+                    _searchController.clear();
+                    sendKey = true;
 
-                  setState(() {
-                    search = '';
-                    query = '';
-                  });
-                },
-                icon: const Icon(Icons.clear),
+                    setState(() {
+                      search = '';
+                      query = '';
+                    });
+                  },
+                  icon: const Icon(Icons.clear),
+                ),
               )),
           autocorrect: false,
           onChanged: (str) {
