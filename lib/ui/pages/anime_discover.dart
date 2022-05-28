@@ -1,6 +1,5 @@
 import "package:flutter/material.dart";
 import "package:fmanime/ui/widgets/anime_grid.dart";
-import "package:fmanime/ui/widgets/anime_search.dart";
 
 class Discover extends StatefulWidget {
   const Discover({Key? key}) : super(key: key);
@@ -10,31 +9,43 @@ class Discover extends StatefulWidget {
 }
 
 class _DiscoverState extends State<Discover> {
+  final _searchController = TextEditingController();
   String search = '';
   String query = '';
+  bool sendKey = false;
 
   @override
   Widget build(BuildContext context) {
-    // return const GridLibrary(
-    //   url: "/popular.html",
-    // );
-    //return const GridLibrarySearch();
-
     return Scaffold(
       appBar: AppBar(
         title: TextField(
-          decoration: const InputDecoration.collapsed(hintText: "Search"),
+          controller: _searchController,
+          decoration: InputDecoration(
+              hintText: "Search",
+              border: InputBorder.none,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _searchController.clear();
+                  sendKey = true;
+
+                  setState(() {
+                    search = '';
+                    query = '';
+                  });
+                },
+                icon: const Icon(Icons.clear),
+              )),
           autocorrect: false,
           onChanged: (str) {
-            search = str;
             setState(() {
+              search = str;
               query = '';
             });
           },
           onEditingComplete: () {
             FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
-              query = search; //.split(' ').join('%20');
+              query = search;
             });
           },
         ),
@@ -44,6 +55,15 @@ class _DiscoverState extends State<Discover> {
   }
 
   Widget buildGrid() {
+    if (search.isEmpty) {
+      if (sendKey) {
+        sendKey = false;
+        return GridLibrary(url: "popular.html", key: UniqueKey());
+      } else {
+        return const GridLibrary(url: "popular.html");
+      }
+    }
+
     if (query.length > 3) {
       return GridLibrary(url: "/search.html?keyword=$query");
     } else {

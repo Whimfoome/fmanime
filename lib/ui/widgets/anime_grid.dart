@@ -35,7 +35,6 @@ class _GridLibraryState extends State<GridLibrary> {
 
   @override
   Widget build(BuildContext context) {
-    print("opa");
     return LayoutBuilder(builder: ((context, constraints) {
       if (items.isNotEmpty) {
         return buildGrid();
