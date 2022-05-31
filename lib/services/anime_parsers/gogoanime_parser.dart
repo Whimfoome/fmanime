@@ -42,7 +42,7 @@ class GogoanimeParser {
           .getElementsByClassName('type')[1]
           .text
           .trim()
-          .split('Plot Summary:')
+          .split('Plot Summary: ')
           .last;
 
       newInfo.id = body
