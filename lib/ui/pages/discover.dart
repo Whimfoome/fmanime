@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fmanime/ui/widgets/anime_grid.dart';
-
-enum ContentType {
-  anime,
-  manga,
-}
+import 'package:fmanime/ui/widgets/grid.dart';
+import 'package:fmanime/models/content_type.dart';
 
 class Discover extends StatefulWidget {
   const Discover({Key? key, required this.contentType}) : super(key: key);
@@ -70,14 +66,23 @@ class _DiscoverState extends State<Discover> {
     if (search.isEmpty) {
       if (sendKey) {
         sendKey = false;
-        return GridLibrary(url: 'popular.html', key: UniqueKey());
+        return GridLibrary(
+            urlQuery: 'popular.html',
+            contentType: widget.contentType,
+            key: UniqueKey());
       } else {
-        return const GridLibrary(url: 'popular.html');
+        return GridLibrary(
+          urlQuery: 'popular.html',
+          contentType: widget.contentType,
+        );
       }
     }
 
     if (query.length > 3) {
-      return GridLibrary(url: '/search.html?keyword=$query');
+      return GridLibrary(
+        urlQuery: '/search.html?keyword=$query',
+        contentType: widget.contentType,
+      );
     } else {
       return Container();
     }

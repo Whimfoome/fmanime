@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fmanime/ui/pages/anime_discover.dart';
+import 'package:fmanime/ui/pages/discover.dart';
+import 'package:fmanime/models/content_type.dart';
 
 class AnimePage extends StatefulWidget {
   const AnimePage({Key? key}) : super(key: key);

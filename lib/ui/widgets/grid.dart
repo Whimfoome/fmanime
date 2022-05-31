@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:fmanime/models/anime_info.dart';
-import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
-import 'package:fmanime/ui/pages/anime_detail.dart';
+import 'package:fmanime/models/entry_info.dart';
+import 'package:fmanime/services/base_parser.dart';
+import 'package:fmanime/ui/pages/detail.dart';
+import 'package:fmanime/models/content_type.dart' as contype;
 
 class GridLibrary extends StatefulWidget {
-  const GridLibrary({Key? key, required this.url}) : super(key: key);
+  const GridLibrary(
+      {Key? key, required this.urlQuery, required this.contentType})
+      : super(key: key);
 
-  final String? url;
+  final String? urlQuery;
+  final contype.ContentType contentType;
 
   @override
   State<GridLibrary> createState() => _GridLibraryState();
 }
 
 class _GridLibraryState extends State<GridLibrary> {
+  late BaseParser gridParser;
   final ScrollController _scrollController = ScrollController();
-  List<AnimeInfo> items = [];
+  List<EntryInfo> items = [];
   bool loading = false, allLoaded = false;
 
   int page = 1;
@@ -22,13 +27,18 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void initState() {
     super.initState();
-    getAnime();
+
+    gridParser = contype.chooseProvider(widget.contentType);
+
+    fetchData();
+
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
           !loading) {
         page++;
-        getAnime();
+
+        fetchData();
       }
     });
   }
@@ -71,7 +81,7 @@ class _GridLibraryState extends State<GridLibrary> {
     );
   }
 
-  Widget buildGridTile(AnimeInfo item) {
+  Widget buildGridTile(EntryInfo item) {
     // Workaround for Ink bleeding through IndexedStack
     // (https://github.com/flutter/flutter/issues/59963)
     return Material(
@@ -118,7 +128,11 @@ class _GridLibraryState extends State<GridLibrary> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => AnimeDetailPage(info: item),
+              builder: (_) => DetailPage(
+                info: item,
+                parser: gridParser,
+                contentType: widget.contentType,
+              ),
             ),
           );
         },
@@ -126,7 +140,7 @@ class _GridLibraryState extends State<GridLibrary> {
     );
   }
 
-  getAnime() {
+  fetchData() {
     if (allLoaded) {
       return;
     }
@@ -134,7 +148,7 @@ class _GridLibraryState extends State<GridLibrary> {
       loading = true;
     });
 
-    GogoanimeParser().getGridData(widget.url, page).then((value) {
+    gridParser.getGridData(widget.urlQuery, page).then((value) {
       final newData = value;
 
       if (newData != null) {

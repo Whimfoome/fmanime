@@ -1,20 +1,22 @@
+import 'package:fmanime/services/base_parser.dart';
 import 'package:html/dom.dart' as dom;
-import 'package:fmanime/models/anime_info.dart';
+import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/html_helper.dart';
 
-class GogoanimeParser {
+class GogoanimeParser extends BaseParser {
   GogoanimeParser();
 
   final String domain = 'https://gogoanime.gg/';
   final String ajax = 'https://ajax.gogo-load.com/ajax/';
 
-  Future<List<AnimeInfo>?> getGridData(String? url, int page) async {
+  @override
+  Future<List<EntryInfo>?> getGridData(String? url, int page) async {
     bool isSearch = url?.startsWith('/search') ?? false;
 
     final link = '$domain${url!}${isSearch ? '&' : '?'}page=$page';
 
     final parsedData = downloadHTML(link).then((body) {
-      List<AnimeInfo> list = [];
+      List<EntryInfo> list = [];
 
       if (body != null) {
         final listDiv = body.getElementsByClassName('items').first.children;
@@ -30,11 +32,12 @@ class GogoanimeParser {
     return parsedData;
   }
 
-  Future<AnimeInfo?> getDetailsData(AnimeInfo info) {
+  @override
+  Future<EntryInfo?> getDetailsData(EntryInfo info) {
     final link = domain + (info.link ?? '');
 
     final parsedData = downloadHTML(link).then((body) {
-      AnimeInfo newInfo = info;
+      EntryInfo newInfo = info;
 
       newInfo.description = body
           ?.getElementsByClassName('anime_info_body_bg')
@@ -60,7 +63,8 @@ class GogoanimeParser {
     return parsedData;
   }
 
-  Future<AnimeInfo?> getEpisodesData(AnimeInfo info) {
+  @override
+  Future<EntryInfo?> getContentData(EntryInfo info) {
     List<Episode> fetchedEpisodes = [];
     final link =
         '${ajax}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}';
@@ -101,7 +105,8 @@ class GogoanimeParser {
     });
   }
 
-  Future<Episode> getEpisodeViewerInfo(Episode episode) async {
+  @override
+  Future<Episode> getViewerInfo(Episode episode) async {
     final epLink = episode.link;
     final link = domain + epLink;
 
@@ -138,8 +143,8 @@ class GogoanimeParser {
     });
   }
 
-  AnimeInfo getMainAnimeInfo(dom.Element element) {
-    AnimeInfo animeInfo = AnimeInfo();
+  EntryInfo getMainAnimeInfo(dom.Element element) {
+    EntryInfo animeInfo = EntryInfo();
 
     final eImage = element
         .getElementsByClassName('img')
