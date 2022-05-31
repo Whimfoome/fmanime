@@ -12,9 +12,9 @@ class _AnimePageState extends State<AnimePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Anime")),
+      appBar: AppBar(title: const Text('Anime')),
       floatingActionButton: FloatingActionButton(
-        heroTag: "discover_anime_btn",
+        heroTag: 'discover_anime_btn',
         onPressed: () {
           Navigator.push(
             context,

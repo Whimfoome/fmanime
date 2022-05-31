@@ -1,7 +1,7 @@
-import "package:flutter/material.dart";
-import "package:fmanime/models/anime_info.dart";
-import "package:fmanime/services/anime_parsers/gogoanime_parser.dart";
-import "package:fmanime/ui/pages/anime_viewer.dart";
+import 'package:flutter/material.dart';
+import 'package:fmanime/models/anime_info.dart';
+import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
+import 'package:fmanime/ui/pages/anime_viewer.dart';
 
 class AnimeDetailPage extends StatefulWidget {
   const AnimeDetailPage({Key? key, required this.info}) : super(key: key);
@@ -55,8 +55,8 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
             padding: const EdgeInsets.all(8.0),
             child: Center(
               child: Text(info.episodes.isNotEmpty
-                  ? "${info.episodes.length} episodes"
-                  : "Loading episodes..."),
+                  ? '${info.episodes.length} episodes'
+                  : 'Loading episodes...'),
             ),
           ),
           const Divider(

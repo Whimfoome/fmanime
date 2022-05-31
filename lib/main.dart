@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 import 'package:fmanime/ui/pages/anime_page.dart';
 import 'package:fmanime/ui/pages/manga_page.dart';
 
@@ -13,12 +13,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Fmanime",
+      title: 'Fmanime',
       darkTheme: ThemeData(
         brightness: Brightness.dark,
       ),
       themeMode: ThemeMode.dark,
-      home: const NavBar(title: "Fmanime"),
+      home: const NavBar(title: 'Fmanime'),
     );
   }
 }
@@ -37,7 +37,7 @@ class _NavBarState extends State<NavBar> {
   final screens = [
     const AnimePage(),
     const MangaPage(),
-    const Center(child: Text("Settings")),
+    const Center(child: Text('Settings')),
   ];
 
   void updateIndex(int index) {
@@ -64,15 +64,15 @@ class _NavBarState extends State<NavBar> {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.play_arrow),
-          label: "Anime",
+          label: 'Anime',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.book),
-          label: "Manga",
+          label: 'Manga',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
-          label: "Settings",
+          label: 'Settings',
         ),
       ],
     );

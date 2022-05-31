@@ -1,6 +1,6 @@
-import "package:http/http.dart" as http;
-import "package:html/dom.dart" as dom;
-import "package:html/parser.dart";
+import 'package:http/http.dart' as http;
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart';
 
 Future<dom.Document?> downloadHTML(String url, {int timeout = 8}) async {
   try {

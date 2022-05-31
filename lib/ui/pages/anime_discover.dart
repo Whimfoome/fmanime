@@ -1,5 +1,5 @@
-import "package:flutter/material.dart";
-import "package:fmanime/ui/widgets/anime_grid.dart";
+import 'package:flutter/material.dart';
+import 'package:fmanime/ui/widgets/anime_grid.dart';
 
 enum ContentType {
   anime,
@@ -28,7 +28,7 @@ class _DiscoverState extends State<Discover> {
         title: TextField(
           controller: _searchController,
           decoration: InputDecoration(
-              hintText: "Search",
+              hintText: 'Search',
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(vertical: 15),
               icon: const Icon(Icons.search),
@@ -70,14 +70,14 @@ class _DiscoverState extends State<Discover> {
     if (search.isEmpty) {
       if (sendKey) {
         sendKey = false;
-        return GridLibrary(url: "popular.html", key: UniqueKey());
+        return GridLibrary(url: 'popular.html', key: UniqueKey());
       } else {
-        return const GridLibrary(url: "popular.html");
+        return const GridLibrary(url: 'popular.html');
       }
     }
 
     if (query.length > 3) {
-      return GridLibrary(url: "/search.html?keyword=$query");
+      return GridLibrary(url: '/search.html?keyword=$query');
     } else {
       return Container();
     }

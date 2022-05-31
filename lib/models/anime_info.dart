@@ -3,7 +3,7 @@ class AnimeInfo {
   String? name;
   String? link;
   String? coverImage;
-  String? description = "";
+  String? description = '';
   String? releaseDate;
 
   List<Episode> episodes = [];

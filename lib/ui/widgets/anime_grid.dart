@@ -1,7 +1,7 @@
-import "package:flutter/material.dart";
-import "package:fmanime/models/anime_info.dart";
-import "package:fmanime/services/anime_parsers/gogoanime_parser.dart";
-import "package:fmanime/ui/pages/anime_detail.dart";
+import 'package:flutter/material.dart';
+import 'package:fmanime/models/anime_info.dart';
+import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
+import 'package:fmanime/ui/pages/anime_detail.dart';
 
 class GridLibrary extends StatefulWidget {
   const GridLibrary({Key? key, required this.url}) : super(key: key);

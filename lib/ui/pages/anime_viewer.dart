@@ -1,10 +1,10 @@
-import "dart:io";
+import 'dart:io';
 
-import "package:flutter/material.dart";
-import "package:flutter/services.dart";
-import "package:fmanime/services/anime_parsers/gogoanime_parser.dart";
-import "package:fmanime/models/anime_info.dart";
-import "package:webview_flutter/webview_flutter.dart";
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
+import 'package:fmanime/models/anime_info.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class AnimeViewer extends StatefulWidget {
   const AnimeViewer({Key? key, required this.episode}) : super(key: key);

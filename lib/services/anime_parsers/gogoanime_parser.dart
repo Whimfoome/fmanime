@@ -1,17 +1,17 @@
-import "package:html/dom.dart" as dom;
-import "package:fmanime/models/anime_info.dart";
-import "package:fmanime/services/html_helper.dart";
+import 'package:html/dom.dart' as dom;
+import 'package:fmanime/models/anime_info.dart';
+import 'package:fmanime/services/html_helper.dart';
 
 class GogoanimeParser {
   GogoanimeParser();
 
-  final String domain = "https://gogoanime.gg/";
-  final String ajax = "https://ajax.gogo-load.com/ajax/";
+  final String domain = 'https://gogoanime.gg/';
+  final String ajax = 'https://ajax.gogo-load.com/ajax/';
 
   Future<List<AnimeInfo>?> getGridData(String? url, int page) async {
-    bool isSearch = url?.startsWith("/search") ?? false;
+    bool isSearch = url?.startsWith('/search') ?? false;
 
-    final link = "$domain${url!}${isSearch ? '&' : '?'}page=$page";
+    final link = '$domain${url!}${isSearch ? '&' : '?'}page=$page';
 
     final parsedData = downloadHTML(link).then((body) {
       List<AnimeInfo> list = [];
@@ -37,7 +37,7 @@ class GogoanimeParser {
       AnimeInfo newInfo = info;
 
       newInfo.description = body
-          ?.getElementsByClassName("anime_info_body_bg")
+          ?.getElementsByClassName('anime_info_body_bg')
           .first
           .getElementsByClassName('type')[1]
           .text
@@ -63,11 +63,11 @@ class GogoanimeParser {
   Future<AnimeInfo?> getEpisodesData(AnimeInfo info) {
     List<Episode> fetchedEpisodes = [];
     final link =
-        "${ajax}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}";
+        '${ajax}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}';
 
     return downloadHTML(link).then((body) {
       final list =
-          body?.getElementById("episode_related")?.getElementsByTagName("li");
+          body?.getElementById('episode_related')?.getElementsByTagName('li');
 
       if (list != null) {
         for (var element in list) {
@@ -82,13 +82,13 @@ class GogoanimeParser {
           final epNumber = element
               .getElementsByTagName('a')
               .first
-              .getElementsByClassName("name")
+              .getElementsByClassName('name')
               .first
               .text
               .trim()
-              .split("EP ")[1];
+              .split('EP ')[1];
 
-          final episode = Episode(link: href, name: "Episode $epNumber");
+          final episode = Episode(link: href, name: 'Episode $epNumber');
           fetchedEpisodes.add(episode);
         }
       } else {
@@ -106,18 +106,18 @@ class GogoanimeParser {
     final link = domain + epLink;
 
     return downloadHTML(link).then((body) {
-      final div = body?.getElementsByClassName("anime_video_body").first;
+      final div = body?.getElementsByClassName('anime_video_body').first;
 
-      final server = div?.getElementsByClassName("anime_muti_link").first;
+      final server = div?.getElementsByClassName('anime_muti_link').first;
       final serverList = server?.nodes[1];
       if (serverList != null) {
         for (var element in serverList.nodes) {
           if (element.runtimeType == dom.Element) {
             final elNode = element.nodes[1];
 
-            var link1 = elNode.attributes["data-video"] ?? '';
-            if (!link1.startsWith("http")) {
-              link1 = "https://$link1";
+            var link1 = elNode.attributes['data-video'] ?? '';
+            if (!link1.startsWith('http')) {
+              link1 = 'https://$link1';
             }
 
             final title1 = elNode.nodes[0].text ?? '';

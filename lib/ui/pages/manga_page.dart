@@ -12,9 +12,9 @@ class _MangaPageState extends State<MangaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Manga")),
+      appBar: AppBar(title: const Text('Manga')),
       floatingActionButton: FloatingActionButton(
-        heroTag: "discover_manga_btn",
+        heroTag: 'discover_manga_btn',
         onPressed: () {
           Navigator.push(
             context,
