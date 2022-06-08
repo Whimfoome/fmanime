@@ -1,23 +1,21 @@
-import 'package:fmanime/services/base_parser.dart';
-import 'package:html/dom.dart' as dom;
 import 'package:fmanime/models/entry_info.dart';
+import 'package:html/dom.dart' as dom;
+import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/services/html_helper.dart';
 import 'package:fmanime/models/content_type.dart' as contype;
 
-class GogoanimeParser extends BaseParser {
-  GogoanimeParser()
+class MangaSeeParser extends BaseParser {
+  MangaSeeParser()
       : super(
-          domain: 'https://gogoanime.gg/',
-          queryPopular: 'popular.html',
-          querySearch: 'search.html?keyword=',
-          contentType: contype.ContentType.anime,
+          domain: 'https://mangasee123.com/',
+          queryPopular: 'search/?sort=v&desc=true',
+          querySearch: 'search/?name=',
+          contentType: contype.ContentType.manga,
         );
-
-  final String ajax = 'https://ajax.gogo-load.com/ajax/';
 
   @override
   Future<List<EntryInfo>?> getGridData(String? url, int page) async {
-    bool isSearch = url?.startsWith('search') ?? false;
+    bool isSearch = url?.startsWith('/search') ?? false;
 
     final link = '$domain${url!}${isSearch ? '&' : '?'}page=$page';
 
@@ -73,7 +71,7 @@ class GogoanimeParser extends BaseParser {
   Future<EntryInfo?> getContentData(EntryInfo info) {
     List<Episode> fetchedEpisodes = [];
     final link =
-        '${ajax}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}';
+        '${domain}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}';
 
     return downloadHTML(link).then((body) {
       final list =

@@ -2,22 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/pages/detail.dart';
-import 'package:fmanime/models/content_type.dart' as contype;
 
 class GridLibrary extends StatefulWidget {
   const GridLibrary(
-      {Key? key, required this.urlQuery, required this.contentType})
+      {Key? key, required this.urlQuery, required this.gridParser})
       : super(key: key);
-
+  final BaseParser gridParser;
   final String? urlQuery;
-  final contype.ContentType contentType;
 
   @override
   State<GridLibrary> createState() => _GridLibraryState();
 }
 
 class _GridLibraryState extends State<GridLibrary> {
-  late BaseParser gridParser;
   final ScrollController _scrollController = ScrollController();
   List<EntryInfo> items = [];
   bool loading = false, allLoaded = false;
@@ -27,8 +24,6 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void initState() {
     super.initState();
-
-    gridParser = contype.chooseProvider(widget.contentType);
 
     fetchData();
 
@@ -130,8 +125,8 @@ class _GridLibraryState extends State<GridLibrary> {
             MaterialPageRoute(
               builder: (_) => DetailPage(
                 info: item,
-                parser: gridParser,
-                contentType: widget.contentType,
+                parser: widget.gridParser,
+                contentType: widget.gridParser.contentType,
               ),
             ),
           );
@@ -148,7 +143,7 @@ class _GridLibraryState extends State<GridLibrary> {
       loading = true;
     });
 
-    gridParser.getGridData(widget.urlQuery, page).then((value) {
+    widget.gridParser.getGridData(widget.urlQuery, page).then((value) {
       final newData = value;
 
       if (newData != null) {
