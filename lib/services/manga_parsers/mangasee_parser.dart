@@ -1,39 +1,68 @@
+import 'dart:convert';
+
 import 'package:fmanime/models/entry_info.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/services/html_helper.dart';
 import 'package:fmanime/models/content_type.dart' as contype;
+import 'package:web_scraper/web_scraper.dart';
 
 class MangaSeeParser extends BaseParser {
   MangaSeeParser()
       : super(
-          domain: 'https://mangasee123.com/',
-          queryPopular: 'search/?sort=v&desc=true',
-          querySearch: 'search/?name=',
+          domain: 'https://mangasee123.com',
+          queryPopular: '/search/?sort=v&desc=true',
+          querySearch: '/search/?name=',
           contentType: contype.ContentType.manga,
         );
 
+  List<EntryInfo> allManga = [];
+
   @override
-  Future<List<EntryInfo>?> getGridData(String? url, int page) async {
-    bool isSearch = url?.startsWith('/search') ?? false;
+  Future<List<EntryInfo>?> getGridData(String url, int page) async {
+    if (allManga.isEmpty) {
+      allManga = await fetchAllManga();
+    }
 
-    final link = '$domain${url!}${isSearch ? '&' : '?'}page=$page';
+    bool isSearch = url.startsWith(querySearch);
 
-    final parsedData = downloadHTML(link).then((body) {
-      List<EntryInfo> list = [];
+    if (isSearch) {
+      final query = url.split(querySearch)[1];
+      return allManga
+          .where((manga) =>
+              manga.name!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
 
-      if (body != null) {
-        final listDiv = body.getElementsByClassName('items').first.children;
+    return allManga;
+  }
 
-        for (var element in listDiv) {
-          list.add(getMainAnimeInfo(element));
-        }
+  Future<List<EntryInfo>> fetchAllManga() async {
+    final webScraper = WebScraper(domain);
+    List<EntryInfo> list = [];
+
+    if (await webScraper.loadWebPage(queryPopular)) {
+      // Get the JSON list of manga
+      Map<String, dynamic> elements =
+          webScraper.getScriptVariables(['vm.Directory']);
+      String scrapedString =
+          elements['vm.Directory'][0].replaceAll('vm.Directory = ', '');
+      String response = scrapedString.substring(0, scrapedString.length - 1);
+      List<dynamic> jsonResponse = jsonDecode(response);
+
+      for (var mangaObject in jsonResponse) {
+        var entryInfo = EntryInfo();
+
+        entryInfo.name = mangaObject['s'];
+        entryInfo.link = mangaObject['i'];
+        entryInfo.coverImage =
+            'https://cover.nep.li/cover/${mangaObject['i']}.jpg';
+
+        list.add(entryInfo);
       }
+    }
 
-      return list;
-    });
-
-    return parsedData;
+    return list;
   }
 
   @override
@@ -145,48 +174,5 @@ class MangaSeeParser extends BaseParser {
 
       return episode;
     });
-  }
-
-  EntryInfo getMainAnimeInfo(dom.Element element) {
-    EntryInfo animeInfo = EntryInfo();
-
-    final eImage = element
-        .getElementsByClassName('img')
-        .first
-        .getElementsByTagName('a')
-        .first
-        .getElementsByTagName('img')
-        .first
-        .attributes
-        .values
-        .first;
-
-    final eAnimeUrl = element
-        .getElementsByClassName('name')
-        .first
-        .getElementsByTagName('a')
-        .first
-        .attributes
-        .values
-        .first;
-
-    final eName = element
-        .getElementsByClassName('name')
-        .first
-        .getElementsByTagName('a')
-        .first
-        .attributes
-        .values
-        .last;
-
-    final eReleaseDate =
-        element.getElementsByClassName('released').first.text.trim();
-
-    animeInfo.name = eName;
-    animeInfo.link = eAnimeUrl;
-    animeInfo.coverImage = eImage;
-    animeInfo.releaseDate = eReleaseDate;
-
-    return animeInfo;
   }
 }

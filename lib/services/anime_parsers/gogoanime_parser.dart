@@ -16,10 +16,10 @@ class GogoanimeParser extends BaseParser {
   final String ajax = 'https://ajax.gogo-load.com/ajax/';
 
   @override
-  Future<List<EntryInfo>?> getGridData(String? url, int page) async {
-    bool isSearch = url?.startsWith('search') ?? false;
+  Future<List<EntryInfo>?> getGridData(String url, int page) async {
+    bool isSearch = url.startsWith('search');
 
-    final link = '$domain${url!}${isSearch ? '&' : '?'}page=$page';
+    final link = '$domain$url${isSearch ? '&' : '?'}page=$page';
 
     final parsedData = downloadHTML(link).then((body) {
       List<EntryInfo> list = [];

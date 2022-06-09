@@ -143,7 +143,7 @@ class _GridLibraryState extends State<GridLibrary> {
       loading = true;
     });
 
-    widget.gridParser.getGridData(widget.urlQuery, page).then((value) {
+    widget.gridParser.getGridData(widget.urlQuery!, page).then((value) {
       final newData = value;
 
       if (newData != null) {
