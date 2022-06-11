@@ -1,16 +1,20 @@
-# fmanime
+# Fmanime
 
-A new Flutter project.
+Fmanime is a cross-platform Japanese animation (Anime) and comics (Manga) player/reader. Built with Flutter, Dart.
 
-## Getting Started
+It scrapes data from popular anime and manga websites. You can add them to your library and track/sync changes with MyAnimeList. 
 
-This project is a starting point for a Flutter application.
+## [TODO](https://github.com/Whimfoome/fmanime/projects/1)
 
-A few resources to get you started if this is your first Flutter project:
+The app is in the prototype stage and almost nothings is working.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+What works:
+- Anime tab
+- Anime Player (WebView) (TODO: Integrated)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Credits
+
+- UI inspired by [Tachiyomi](https://github.com/tachiyomiorg/tachiyomi)
+- Parsers: [Tako-Play](https://github.com/kaungsatthe1n/Tako-Play), [AnimeGo-Re](https://github.com/HQAnime/AnimeGo-Re), [Aniyomi Extensions](https://github.com/jmir1/aniyomi-extensions), [MAPI](https://github.com/Hecsall/MAPI) 
+
+## 🌟 If you like it, please star the repository! 

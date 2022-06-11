@@ -1,0 +1,8 @@
+{
+    "explorer.excludeGitIgnore": true,
+    "files.exclude": {
+        "build": true,
+        ".metadata": true,
+        "pubspec.lock": true,
+    }
+}
