@@ -146,16 +146,14 @@ class _GridLibraryState extends State<GridLibrary> {
     widget.gridParser.getGridData(widget.urlQuery!, page).then((value) {
       final newData = value;
 
-      if (newData != null) {
-        if (newData.isNotEmpty) {
-          items.addAll(newData);
-        }
-
-        setState(() {
-          loading = false;
-          allLoaded = newData.isEmpty;
-        });
+      if (newData.isNotEmpty) {
+        items.addAll(newData);
       }
+
+      setState(() {
+        loading = false;
+        allLoaded = newData.isEmpty;
+      });
     });
   }
 }

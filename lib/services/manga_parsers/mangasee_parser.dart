@@ -19,7 +19,11 @@ class MangaSeeParser extends BaseParser {
   List<EntryInfo> allManga = [];
 
   @override
-  Future<List<EntryInfo>?> getGridData(String url, int page) async {
+  Future<List<EntryInfo>> getGridData(String url, int page) async {
+    if (page > 1) {
+      return [];
+    }
+
     if (allManga.isEmpty) {
       allManga = await fetchAllManga();
     }
@@ -66,76 +70,39 @@ class MangaSeeParser extends BaseParser {
   }
 
   @override
-  Future<EntryInfo?> getDetailsData(EntryInfo info) {
-    final link = domain + (info.link ?? '');
+  Future<EntryInfo> getDetailsData(EntryInfo info) async {
+    EntryInfo newInfo = info;
+    newInfo.description = 'Placeholder description';
 
-    final parsedData = downloadHTML(link).then((body) {
-      EntryInfo newInfo = info;
-
-      newInfo.description = body
-          ?.getElementsByClassName('anime_info_body_bg')
-          .first
-          .getElementsByClassName('type')[1]
-          .text
-          .trim()
-          .split('Plot Summary: ')
-          .last;
-
-      newInfo.id = body
-          ?.getElementsByClassName('anime_info_episodes_next')
-          .first
-          .getElementsByTagName('input')
-          .first
-          .attributes
-          .values
-          .elementAt(1);
-
-      return newInfo;
-    });
-
-    return parsedData;
+    return newInfo;
   }
 
   @override
-  Future<EntryInfo?> getContentData(EntryInfo info) {
+  Future<EntryInfo?> getContentData(EntryInfo info) async {
+    final webScraper = WebScraper(domain);
     List<Episode> fetchedEpisodes = [];
-    final link =
-        '${domain}load-list-episode?ep_start=0&ep_end=5000&id=${info.id}';
 
-    return downloadHTML(link).then((body) {
-      final list =
-          body?.getElementById('episode_related')?.getElementsByTagName('li');
+    if (await webScraper.loadWebPage('/manga/${info.link}')) {
+      // Get the JSON list of manga
+      Map<String, dynamic> elements =
+          webScraper.getScriptVariables(['vm.Chapters']);
+      String scrapedString =
+          elements['vm.Chapters'][0].replaceAll('vm.Chapters = ', '');
+      String response = scrapedString.substring(0, scrapedString.length - 1);
+      List<dynamic> jsonResponse = jsonDecode(response);
 
-      if (list != null) {
-        for (var element in list) {
-          final href = element
-              .getElementsByTagName('a')
-              .first
-              .attributes
-              .values
-              .first
-              .trim();
+      // Create Chapter items and add them to the list
+      for (var chapterObject in jsonResponse) {
+        final chapNumber = processChapterNumber(chapterObject['Chapter']);
 
-          final epNumber = element
-              .getElementsByTagName('a')
-              .first
-              .getElementsByClassName('name')
-              .first
-              .text
-              .trim()
-              .split('EP ')[1];
-
-          final episode = Episode(link: href, name: 'Episode $epNumber');
-          fetchedEpisodes.add(episode);
-        }
-      } else {
-        fetchedEpisodes = [];
+        final chapter = Episode(link: info.link!, name: 'Chapter $chapNumber');
+        fetchedEpisodes.add(chapter);
       }
 
       info.episodes = fetchedEpisodes.reversed.toList();
+    }
 
-      return info;
-    });
+    return info;
   }
 
   @override
@@ -174,5 +141,35 @@ class MangaSeeParser extends BaseParser {
 
       return episode;
     });
+  }
+
+  /// Converts "MangaSee chapter formatting" to a readable chapter number.
+  ///
+  /// Chapter formatting:
+  /// ```
+  /// eg. 109565 -> [1] [0956] [5]      -> Chapter 956.5
+  ///                ?   chap.  decimal
+  /// ```
+  /// [chapter] is the chapter number formatted from MangaSee's website.
+  /// Returns a readable chapter number.
+  String processChapterNumber(String chapter) {
+    String decimalNumber =
+        chapter.substring(chapter.length - 1, chapter.length);
+    String decimal = decimalNumber != '0' ? '.$decimalNumber' : '';
+    String integer = removeChapterPad(chapter.substring(1, chapter.length - 1));
+    return integer + decimal;
+  }
+
+  /// Removes zero-padding from [chapter].
+  ///
+  /// Recursive function that keeps removing leading "0" until there are no more.
+  /// If the final string is empty, it returns "0" (It will be empty if the
+  /// chapter number is actually "0" and it gets deleted by the function).
+  /// Returns the chapter without zero-padding.
+  String removeChapterPad(String chapter) {
+    if (chapter.startsWith('0')) {
+      return removeChapterPad(chapter.substring(1, chapter.length));
+    }
+    return chapter.isNotEmpty ? chapter : '0';
   }
 }

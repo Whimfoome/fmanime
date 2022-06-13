@@ -14,7 +14,7 @@ abstract class BaseParser {
     required this.contentType,
   });
 
-  Future<List<EntryInfo>?> getGridData(String url, int page);
+  Future<List<EntryInfo>> getGridData(String url, int page);
 
   Future<EntryInfo?> getDetailsData(EntryInfo info);
 
