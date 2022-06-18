@@ -1,11 +1,8 @@
 import 'dart:convert';
 
 import 'package:fmanime/models/entry_info.dart';
-import 'package:html/dom.dart' as dom;
 import 'package:fmanime/services/base_parser.dart';
-import 'package:fmanime/services/html_helper.dart';
 import 'package:fmanime/models/content_type.dart' as contype;
-import 'package:web_scraper/web_scraper.dart';
 
 class MangaSeeParser extends BaseParser {
   MangaSeeParser()
@@ -42,7 +39,6 @@ class MangaSeeParser extends BaseParser {
   }
 
   Future<List<EntryInfo>> fetchAllManga() async {
-    final webScraper = WebScraper(domain);
     List<EntryInfo> list = [];
 
     if (await webScraper.loadWebPage(queryPopular)) {
@@ -79,7 +75,6 @@ class MangaSeeParser extends BaseParser {
 
   @override
   Future<EntryInfo?> getContentData(EntryInfo info) async {
-    final webScraper = WebScraper(domain);
     List<Episode> fetchedEpisodes = [];
 
     if (await webScraper.loadWebPage('/manga/${info.link}')) {
@@ -107,40 +102,26 @@ class MangaSeeParser extends BaseParser {
 
   @override
   Future<Episode> getViewerInfo(Episode episode) async {
-    final epLink = episode.link;
-    final link = domain + epLink;
+    if (await webScraper.loadWebPage(episode.link)) {
+      final serversList = webScraper.getElement(
+          'div.anime_video_body > div.anime_muti_link > ul > li > a',
+          ['data-video']);
 
-    return downloadHTML(link).then((body) {
-      final div = body?.getElementsByClassName('anime_video_body').first;
-
-      final server = div?.getElementsByClassName('anime_muti_link').first;
-      final serverList = server?.nodes[1];
-      if (serverList != null) {
-        for (var element in serverList.nodes) {
-          if (element.runtimeType == dom.Element) {
-            final elNode = element.nodes[1];
-
-            var link1 = elNode.attributes['data-video'] ?? '';
-            if (!link1.startsWith('http')) {
-              link1 = 'https://$link1';
-            }
-
-            final title1 = elNode.nodes[0].text ?? '';
-            String? theTitle;
-            if (title1.trim().isEmpty) {
-              theTitle = elNode.nodes[2].text?.toUpperCase();
-            } else {
-              theTitle = title1.toUpperCase();
-            }
-
-            episode.videoServers
-                .add(VideoServer(title: theTitle!, link: link1));
-          }
+      for (var i = 0; i < serversList.length; i++) {
+        var serverLink = serversList[i]['attributes']['data-video'];
+        if (!serverLink.startsWith('http')) {
+          serverLink = 'https://$serverLink';
         }
-      }
 
-      return episode;
-    });
+        String serverTitle = serversList[i]['title'];
+        serverTitle = serverTitle.trim().split('Choose')[0];
+
+        episode.videoServers
+            .add(VideoServer(title: serverTitle, link: serverLink));
+      }
+    }
+
+    return episode;
   }
 
   /// Converts "MangaSee chapter formatting" to a readable chapter number.
