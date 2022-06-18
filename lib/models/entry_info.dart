@@ -1,4 +1,4 @@
-class AnimeInfo {
+class EntryInfo {
   String? id;
   String? name;
   String? link;
@@ -8,7 +8,7 @@ class AnimeInfo {
 
   List<Episode> episodes = [];
 
-  AnimeInfo();
+  EntryInfo();
 
   String? getTitle() => name;
 }

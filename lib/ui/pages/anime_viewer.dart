@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
-import 'package:fmanime/models/anime_info.dart';
+import 'package:fmanime/models/entry_info.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AnimeViewer extends StatefulWidget {
@@ -33,7 +33,7 @@ class _AnimeViewerState extends State<AnimeViewer> {
       DeviceOrientation.landscapeRight,
     ]);
 
-    GogoanimeParser().getEpisodeViewerInfo(widget.episode).then((value) {
+    GogoanimeParser().getViewerInfo(widget.episode).then((value) {
       setState(() {
         stateEpisode = value;
         episodeLoaded = true;

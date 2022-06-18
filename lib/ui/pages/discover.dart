@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fmanime/ui/widgets/anime_grid.dart';
-
-enum ContentType {
-  anime,
-  manga,
-}
+import 'package:fmanime/services/base_parser.dart';
+import 'package:fmanime/ui/widgets/grid.dart';
+import 'package:fmanime/models/content_type.dart';
+import 'package:fmanime/models/content_type.dart' as contype;
 
 class Discover extends StatefulWidget {
   const Discover({Key? key, required this.contentType}) : super(key: key);
@@ -16,10 +14,18 @@ class Discover extends StatefulWidget {
 }
 
 class _DiscoverState extends State<Discover> {
+  late BaseParser gridParser;
   final _searchController = TextEditingController();
   String search = '';
   String query = '';
   bool sendKey = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    gridParser = contype.chooseProvider(widget.contentType);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,14 +76,24 @@ class _DiscoverState extends State<Discover> {
     if (search.isEmpty) {
       if (sendKey) {
         sendKey = false;
-        return GridLibrary(url: 'popular.html', key: UniqueKey());
+        return GridLibrary(
+          urlQuery: gridParser.queryPopular,
+          gridParser: gridParser,
+          key: UniqueKey(),
+        );
       } else {
-        return const GridLibrary(url: 'popular.html');
+        return GridLibrary(
+          urlQuery: gridParser.queryPopular,
+          gridParser: gridParser,
+        );
       }
     }
 
     if (query.length > 3) {
-      return GridLibrary(url: '/search.html?keyword=$query');
+      return GridLibrary(
+        urlQuery: gridParser.querySearch + query,
+        gridParser: gridParser,
+      );
     } else {
       return Container();
     }

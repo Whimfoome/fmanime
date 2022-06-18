@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:fmanime/models/anime_info.dart';
-import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
+import 'package:fmanime/models/entry_info.dart';
+import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/pages/anime_viewer.dart';
+import 'package:fmanime/models/content_type.dart' as contype;
 
-class AnimeDetailPage extends StatefulWidget {
-  const AnimeDetailPage({Key? key, required this.info}) : super(key: key);
+class DetailPage extends StatefulWidget {
+  const DetailPage(
+      {Key? key,
+      required this.info,
+      required this.parser,
+      required this.contentType})
+      : super(key: key);
 
-  final AnimeInfo info;
+  final BaseParser parser;
+  final EntryInfo info;
+  final contype.ContentType contentType;
 
   @override
-  State<AnimeDetailPage> createState() => _AnimeDetailPageState();
+  State<DetailPage> createState() => _DetailPageState();
 }
 
-class _AnimeDetailPageState extends State<AnimeDetailPage> {
-  late AnimeInfo info;
+class _DetailPageState extends State<DetailPage> {
+  late EntryInfo info;
 
   @override
   void initState() {
@@ -25,7 +33,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
   }
 
   Future showDetails() async {
-    await GogoanimeParser().getDetailsData(info).then((value) {
+    await widget.parser.getDetailsData(info).then((value) {
       if (value != null) {
         setState(() {
           info = value;
@@ -33,7 +41,7 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
       }
     });
 
-    GogoanimeParser().getEpisodesData(info).then((value) {
+    widget.parser.getContentData(info).then((value) {
       if (value != null) {
         setState(() {
           info = value;
@@ -54,21 +62,19 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Center(
-              child: Text(info.episodes.isNotEmpty
-                  ? '${info.episodes.length} episodes'
-                  : 'Loading episodes...'),
+              child: loadingText(),
             ),
           ),
           const Divider(
             height: 1,
           ),
-          buildEpisodes(),
+          buildContents(),
         ],
       ),
     );
   }
 
-  Widget buildEpisodes() {
+  Widget buildContents() {
     if (info.episodes.isNotEmpty) {
       return ListView.builder(
         shrinkWrap: true,
@@ -162,5 +168,15 @@ class _AnimeDetailPageState extends State<AnimeDetailPage> {
     } else {
       return const Center(child: CircularProgressIndicator());
     }
+  }
+
+  Widget loadingText() {
+    final contentName = widget.contentType == contype.ContentType.anime
+        ? 'episodes'
+        : 'chapters';
+
+    return Text(info.episodes.isNotEmpty
+        ? '${info.episodes.length} $contentName'
+        : 'Loading $contentName...');
   }
 }
