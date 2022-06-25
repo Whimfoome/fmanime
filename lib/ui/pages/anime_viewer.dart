@@ -26,7 +26,8 @@ class _AnimeViewerState extends State<AnimeViewer> {
     if (Platform.isAndroid) WebView.platform = AndroidWebView();
     if (Platform.isIOS) WebView.platform = CupertinoWebView();
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
+        overlays: []);
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -66,11 +67,11 @@ class _AnimeViewerState extends State<AnimeViewer> {
   Widget buildUi(BuildContext context) {
     if (episodeLoaded) {
       return WebView(
-        initialUrl: stateEpisode.videoServers[0].link,
+        initialUrl: stateEpisode.servers[0],
         javascriptMode: JavascriptMode.unrestricted,
         initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
         navigationDelegate: (request) async {
-          if (!request.url.contains(stateEpisode.videoServers[0].link)) {
+          if (!request.url.contains(stateEpisode.servers[0])) {
             return NavigationDecision.prevent;
           } else {
             return NavigationDecision.navigate;

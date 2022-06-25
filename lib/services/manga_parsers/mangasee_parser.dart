@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/base_parser.dart';
-import 'package:fmanime/models/content_type.dart' as contype;
+import 'package:fmanime/utils/content_type.dart' as contype;
 
 class MangaSeeParser extends BaseParser {
   MangaSeeParser()
@@ -90,7 +90,7 @@ class MangaSeeParser extends BaseParser {
       for (var chapterObject in jsonResponse) {
         final chapNumber = processChapterNumber(chapterObject['Chapter']);
 
-        final chapter = Episode(link: info.link!, name: 'Chapter $chapNumber');
+        final chapter = Episode(link: info.link!, name: chapNumber);
         fetchedEpisodes.add(chapter);
       }
 
@@ -102,26 +102,57 @@ class MangaSeeParser extends BaseParser {
 
   @override
   Future<Episode> getViewerInfo(Episode episode) async {
-    if (await webScraper.loadWebPage(episode.link)) {
-      final serversList = webScraper.getElement(
-          'div.anime_video_body > div.anime_muti_link > ul > li > a',
-          ['data-video']);
+    List<String> pagesList = [];
 
-      for (var i = 0; i < serversList.length; i++) {
-        var serverLink = serversList[i]['attributes']['data-video'];
-        if (!serverLink.startsWith('http')) {
-          serverLink = 'https://$serverLink';
-        }
+    if (await webScraper.loadWebPage(
+        '/read-online/${episode.link}-chapter-${episode.name}-page-1.html')) {
+      // Get server url
+      Map<String, dynamic> elementsServer =
+          webScraper.getScriptVariables(['vm.CurPathName']);
+      String scrapedStringServer = elementsServer['vm.CurPathName'][0]
+          .replaceAll('vm.CurPathName = ', '');
+      String responseServer =
+          scrapedStringServer.substring(1, scrapedStringServer.length - 2);
 
-        String serverTitle = serversList[i]['title'];
-        serverTitle = serverTitle.trim().split('Choose')[0];
+      // Get the JSON list of pages
+      Map<String, dynamic> elements =
+          webScraper.getScriptVariables(['vm.CurChapter']);
+      String scrapedString =
+          elements['vm.CurChapter'][0].replaceAll('vm.CurChapter = ', '');
+      String response = scrapedString.substring(0, scrapedString.length - 1);
+      Map<String, dynamic> jsonResponse = jsonDecode(response);
 
-        episode.videoServers
-            .add(VideoServer(title: serverTitle, link: serverLink));
+      // Create Chapter items and add them to the list
+      String pathName = responseServer;
+      String paddedChapterNumber = padChapter(episode.name);
+      String directory = jsonResponse['Directory'].length > 0
+          ? jsonResponse['Directory'] + '/'
+          : '';
+
+      for (int page = 1; page <= int.parse(jsonResponse['Page']); page++) {
+        String paddedPageNumber = page.toString().padLeft(3, '0');
+        String pageUrl =
+            'https://$pathName/manga/${episode.link}/$directory$paddedChapterNumber-$paddedPageNumber.png';
+
+        pagesList.add(pageUrl);
       }
     }
 
+    episode.servers.addAll(pagesList);
+
     return episode;
+  }
+
+  /// Converts a [chapter] to a zero padded number.
+  ///
+  /// If [chapter] is an integer will return: 0015
+  /// If [chapter] is decimal, will return: 0015.5
+  String padChapter(String chapter) {
+    if (chapter.contains('.')) {
+      return chapter.padLeft(6, '0');
+    } else {
+      return chapter.padLeft(4, '0');
+    }
   }
 
   /// Converts "MangaSee chapter formatting" to a readable chapter number.

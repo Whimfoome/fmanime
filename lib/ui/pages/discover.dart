@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/widgets/grid.dart';
-import 'package:fmanime/models/content_type.dart';
-import 'package:fmanime/models/content_type.dart' as contype;
+import 'package:fmanime/utils/content_type.dart';
+import 'package:fmanime/utils/content_type.dart' as contype;
 
 class Discover extends StatefulWidget {
   const Discover({Key? key, required this.contentType}) : super(key: key);

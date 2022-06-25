@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/ui/pages/discover.dart';
-import 'package:fmanime/models/content_type.dart';
+import 'package:fmanime/utils/content_type.dart';
 
 class MangaPage extends StatefulWidget {
   const MangaPage({Key? key}) : super(key: key);

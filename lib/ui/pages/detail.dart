@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/pages/anime_viewer.dart';
-import 'package:fmanime/models/content_type.dart' as contype;
+import 'package:fmanime/ui/pages/manga_reader.dart';
+import 'package:fmanime/utils/content_type.dart' as contype;
 
 class DetailPage extends StatefulWidget {
   const DetailPage(
@@ -84,12 +85,15 @@ class _DetailPageState extends State<DetailPage> {
         itemCount: info.episodes.length,
         itemBuilder: ((context, index) {
           return ListTile(
-            title: Text(info.episodes[index].name),
+            title: episodeName(index),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => AnimeViewer(episode: info.episodes[index]),
+                  builder: (_) =>
+                      widget.contentType == contype.ContentType.anime
+                          ? AnimeViewer(episode: info.episodes[index])
+                          : MangaReader(episode: info.episodes[index]),
                 ),
               );
             },
@@ -178,5 +182,12 @@ class _DetailPageState extends State<DetailPage> {
     return Text(info.episodes.isNotEmpty
         ? '${info.episodes.length} $contentName'
         : 'Loading $contentName...');
+  }
+
+  Text episodeName(int index) {
+    final contentName =
+        widget.contentType == contype.ContentType.anime ? 'Episode' : 'Chapter';
+
+    return Text('$contentName ${info.episodes[index].name}');
   }
 }

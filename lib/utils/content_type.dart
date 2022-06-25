@@ -1,4 +1,3 @@
-// This isn't even model file, but I keep it here for conveniece...
 import 'package:fmanime/services/anime_parsers/gogoanime_parser.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/services/manga_parsers/mangasee_parser.dart';

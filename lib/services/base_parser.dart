@@ -1,5 +1,5 @@
 import 'package:fmanime/models/entry_info.dart';
-import 'package:fmanime/models/content_type.dart' as contype;
+import 'package:fmanime/utils/content_type.dart' as contype;
 import 'package:web_scraper/web_scraper.dart';
 
 abstract class BaseParser {

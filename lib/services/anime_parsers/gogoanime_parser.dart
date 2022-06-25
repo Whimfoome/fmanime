@@ -1,6 +1,6 @@
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/models/entry_info.dart';
-import 'package:fmanime/models/content_type.dart' as contype;
+import 'package:fmanime/utils/content_type.dart' as contype;
 import 'package:web_scraper/web_scraper.dart';
 
 class GogoanimeParser extends BaseParser {
@@ -16,7 +16,7 @@ class GogoanimeParser extends BaseParser {
 
   @override
   Future<List<EntryInfo>> getGridData(String url, int page) async {
-    bool isSearch = url.startsWith('search');
+    bool isSearch = url.startsWith(querySearch);
 
     final dataRoute = '$url${isSearch ? '&' : '?'}page=$page';
 
@@ -82,7 +82,7 @@ class GogoanimeParser extends BaseParser {
         String epHref = hrefElements[i]['attributes']['href'] as String;
         epHref = epHref.trim();
 
-        final episode = Episode(link: epHref, name: 'Episode $epName');
+        final episode = Episode(link: epHref, name: epName);
         fetchedEpisodes.add(episode);
       }
     }
@@ -105,11 +105,10 @@ class GogoanimeParser extends BaseParser {
           serverLink = 'https://$serverLink';
         }
 
-        String serverTitle = serversList[i]['title'];
-        serverTitle = serverTitle.trim().split('Choose')[0];
+        // String serverTitle = serversList[i]['title'];
+        // serverTitle = serverTitle.trim().split('Choose')[0];
 
-        episode.videoServers
-            .add(VideoServer(title: serverTitle, link: serverLink));
+        episode.servers.add(serverLink);
       }
     }
 
