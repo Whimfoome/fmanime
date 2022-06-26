@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/ui/pages/anime_page.dart';
 import 'package:fmanime/ui/pages/manga_page.dart';
+import 'package:fmanime/utils/theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,9 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Fmanime',
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-      ),
+      darkTheme: appTheme(),
       themeMode: ThemeMode.dark,
       home: const NavBar(title: 'Fmanime'),
     );
