@@ -50,13 +50,16 @@ class MangaSeeParser extends BaseParser {
       String response = scrapedString.substring(0, scrapedString.length - 1);
       List<dynamic> jsonResponse = jsonDecode(response);
 
+      // Sort by Popular Monthly
+      jsonResponse.sort((a, b) => b["vm"].compareTo(a["vm"]));
+
       for (var mangaObject in jsonResponse) {
         var entryInfo = EntryInfo();
 
         entryInfo.name = mangaObject['s'];
         entryInfo.link = mangaObject['i'];
         entryInfo.coverImage =
-            'https://cover.nep.li/cover/${mangaObject['i']}.jpg';
+            'https://temp.compsci88.com/cover/${mangaObject['i']}.jpg';
 
         list.add(entryInfo);
       }
@@ -67,10 +70,15 @@ class MangaSeeParser extends BaseParser {
 
   @override
   Future<EntryInfo> getDetailsData(EntryInfo info) async {
-    EntryInfo newInfo = info;
-    newInfo.description = 'Placeholder description';
+    if (await webScraper.loadWebPage('/manga/${info.link}')) {
+      final descriptionElement =
+          webScraper.getElement('li.list-group-item > div.Content', []);
 
-    return newInfo;
+      String description = descriptionElement[0]['title'];
+      info.description = description;
+    }
+
+    return info;
   }
 
   @override

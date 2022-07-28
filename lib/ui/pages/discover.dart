@@ -63,7 +63,7 @@ class _DiscoverState extends State<Discover> {
           onEditingComplete: () {
             FocusScope.of(context).requestFocus(FocusNode());
             setState(() {
-              query = search;
+              query = search.trim();
             });
           },
         ),
