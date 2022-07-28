@@ -24,5 +24,5 @@ abstract class BaseParser {
 
   Future<EntryInfo?> getContentData(EntryInfo info);
 
-  Future<Episode> getViewerInfo(Episode episode);
+  Future<Episode> getViewerInfo(Episode episode, [EntryInfo? info]);
 }

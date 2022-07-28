@@ -14,6 +14,7 @@ class MangaSeeParser extends BaseParser {
         );
 
   List<EntryInfo> allManga = [];
+  final chapterImageRegex = RegExp(r'^0+');
 
   @override
   Future<List<EntryInfo>> getGridData(String url, int page) async {
@@ -42,13 +43,7 @@ class MangaSeeParser extends BaseParser {
     List<EntryInfo> list = [];
 
     if (await webScraper.loadWebPage(queryPopular)) {
-      // Get the JSON list of manga
-      Map<String, dynamic> elements =
-          webScraper.getScriptVariables(['vm.Directory']);
-      String scrapedString =
-          elements['vm.Directory'][0].replaceAll('vm.Directory = ', '');
-      String response = scrapedString.substring(0, scrapedString.length - 1);
-      List<dynamic> jsonResponse = jsonDecode(response);
+      List<dynamic> jsonResponse = varToJson('vm.Directory');
 
       // Sort by Popular Monthly
       jsonResponse.sort((a, b) => b["vm"].compareTo(a["vm"]));
@@ -86,19 +81,25 @@ class MangaSeeParser extends BaseParser {
     List<Episode> fetchedEpisodes = [];
 
     if (await webScraper.loadWebPage('/manga/${info.link}')) {
-      // Get the JSON list of manga
-      Map<String, dynamic> elements =
-          webScraper.getScriptVariables(['vm.Chapters']);
-      String scrapedString =
-          elements['vm.Chapters'][0].replaceAll('vm.Chapters = ', '');
-      String response = scrapedString.substring(0, scrapedString.length - 1);
-      List<dynamic> jsonResponse = jsonDecode(response);
+      List<dynamic> jsonResponse = varToJson('vm.Chapters');
 
       // Create Chapter items and add them to the list
       for (var chapterObject in jsonResponse) {
-        final chapNumber = processChapterNumber(chapterObject['Chapter']);
+        String? name = chapterObject['ChapterName'];
+        String indexChapter = chapterObject['Chapter'];
 
-        final chapter = Episode(link: info.link!, name: chapNumber);
+        if (name == null || name.isEmpty) {
+          name = '${chapterObject['Type']} ${chapterImage(indexChapter, true)}';
+        }
+
+        var splittedName = name.split(' ');
+        splittedName.last = removeNumberPad(splittedName.last);
+        name = splittedName.join(' ');
+
+        String url =
+            '/read-online/${info.link}${chapterURLEncode(indexChapter)}';
+
+        final chapter = Episode(link: url, name: name);
         fetchedEpisodes.add(chapter);
       }
 
@@ -109,11 +110,14 @@ class MangaSeeParser extends BaseParser {
   }
 
   @override
-  Future<Episode> getViewerInfo(Episode episode) async {
+  Future<Episode> getViewerInfo(Episode episode, [EntryInfo? info]) async {
     List<String> pagesList = [];
 
-    if (await webScraper.loadWebPage(
-        '/read-online/${episode.link}-chapter-${episode.name}-page-1.html')) {
+    if (info == null) {
+      return episode;
+    }
+
+    if (await webScraper.loadWebPage(episode.link)) {
       // Get server url
       Map<String, dynamic> elementsServer =
           webScraper.getScriptVariables(['vm.CurPathName']);
@@ -122,17 +126,11 @@ class MangaSeeParser extends BaseParser {
       String responseServer =
           scrapedStringServer.substring(1, scrapedStringServer.length - 2);
 
-      // Get the JSON list of pages
-      Map<String, dynamic> elements =
-          webScraper.getScriptVariables(['vm.CurChapter']);
-      String scrapedString =
-          elements['vm.CurChapter'][0].replaceAll('vm.CurChapter = ', '');
-      String response = scrapedString.substring(0, scrapedString.length - 1);
-      Map<String, dynamic> jsonResponse = jsonDecode(response);
+      Map<String, dynamic> jsonResponse = varToJson('vm.CurChapter');
 
       // Create Chapter items and add them to the list
       String pathName = responseServer;
-      String paddedChapterNumber = padChapter(episode.name);
+      String paddedChapterNumber = addNumberPad(episode.name.split(' ').last);
       String directory = jsonResponse['Directory'].length > 0
           ? jsonResponse['Directory'] + '/'
           : '';
@@ -140,8 +138,9 @@ class MangaSeeParser extends BaseParser {
       for (int page = 1; page <= int.parse(jsonResponse['Page']); page++) {
         String paddedPageNumber = page.toString().padLeft(3, '0');
         String pageUrl =
-            'https://$pathName/manga/${episode.link}/$directory$paddedChapterNumber-$paddedPageNumber.png';
+            'https://$pathName/manga/${info.link}/$directory$paddedChapterNumber-$paddedPageNumber.png';
 
+        print(pageUrl);
         pagesList.add(pageUrl);
       }
     }
@@ -151,45 +150,78 @@ class MangaSeeParser extends BaseParser {
     return episode;
   }
 
-  /// Converts a [chapter] to a zero padded number.
-  ///
-  /// If [chapter] is an integer will return: 0015
-  /// If [chapter] is decimal, will return: 0015.5
-  String padChapter(String chapter) {
-    if (chapter.contains('.')) {
-      return chapter.padLeft(6, '0');
+  dynamic varToJson(String varName) {
+    Map<String, dynamic> elements = webScraper.getScriptVariables([varName]);
+
+    String scrapedString = elements[varName][0].replaceAll('$varName = ', '');
+
+    String response = scrapedString.substring(0, scrapedString.length - 1);
+
+    return jsonDecode(response);
+  }
+
+  String chapterImage(String e, bool cleanString) {
+    var a = e.substring(1, e.length - 1);
+
+    if (cleanString) {
+      a.replaceFirst(chapterImageRegex, '');
+    }
+
+    var b = int.parse(e.substring(e.length - 1));
+
+    if (b == 0 && a.isNotEmpty) {
+      return a;
+    } else if (b == 0 && a.isEmpty) {
+      return '0';
     } else {
-      return chapter.padLeft(4, '0');
+      return '$a.$b';
     }
   }
 
-  /// Converts "MangaSee chapter formatting" to a readable chapter number.
-  ///
-  /// Chapter formatting:
-  /// ```
-  /// eg. 109565 -> [1] [0956] [5]      -> Chapter 956.5
-  ///                ?   chap.  decimal
-  /// ```
-  /// [chapter] is the chapter number formatted from MangaSee's website.
-  /// Returns a readable chapter number.
-  String processChapterNumber(String chapter) {
-    String decimalNumber =
-        chapter.substring(chapter.length - 1, chapter.length);
-    String decimal = decimalNumber != '0' ? '.$decimalNumber' : '';
-    String integer = removeChapterPad(chapter.substring(1, chapter.length - 1));
-    return integer + decimal;
+  String chapterURLEncode(String e) {
+    var index = '';
+    final t = int.parse(e.substring(0, 1));
+
+    if (t != 1) {
+      index = '-index-$t';
+    }
+
+    int dgt;
+    if (int.parse(e) < 100100) {
+      dgt = 4;
+    } else if (int.parse(e) < 101000) {
+      dgt = 3;
+    } else if (int.parse(e) < 110000) {
+      dgt = 2;
+    } else {
+      dgt = 1;
+    }
+
+    final n = e.substring(dgt, e.length - 1);
+    var suffix = '';
+    final path = int.parse(e.substring(e.length - 1));
+
+    if (path != 0) {
+      suffix = '.$path';
+    }
+
+    return '-chapter-$n$suffix$index.html';
   }
 
-  /// Removes zero-padding from [chapter].
-  ///
-  /// Recursive function that keeps removing leading "0" until there are no more.
-  /// If the final string is empty, it returns "0" (It will be empty if the
-  /// chapter number is actually "0" and it gets deleted by the function).
-  /// Returns the chapter without zero-padding.
-  String removeChapterPad(String chapter) {
-    if (chapter.startsWith('0')) {
-      return removeChapterPad(chapter.substring(1, chapter.length));
+  // 0005 -> 5
+  String removeNumberPad(String number) {
+    if (number.startsWith('0')) {
+      return removeNumberPad(number.substring(1, number.length));
     }
-    return chapter.isNotEmpty ? chapter : '0';
+
+    return number.isNotEmpty ? number : '0';
+  }
+
+  String addNumberPad(String number) {
+    if (number.contains('.')) {
+      return number.padLeft(6, '0');
+    } else {
+      return number.padLeft(4, '0');
+    }
   }
 }

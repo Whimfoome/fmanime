@@ -93,7 +93,10 @@ class _DetailPageState extends State<DetailPage> {
                   builder: (_) =>
                       widget.contentType == contype.ContentType.anime
                           ? AnimeViewer(episode: info.episodes[index])
-                          : MangaReader(episode: info.episodes[index]),
+                          : MangaReader(
+                              episode: info.episodes[index],
+                              entryInfo: info,
+                            ),
                 ),
               );
             },
@@ -186,7 +189,7 @@ class _DetailPageState extends State<DetailPage> {
 
   Text episodeName(int index) {
     final contentName =
-        widget.contentType == contype.ContentType.anime ? 'Episode' : 'Chapter';
+        widget.contentType == contype.ContentType.anime ? 'Episode' : '';
 
     return Text('$contentName ${info.episodes[index].name}');
   }

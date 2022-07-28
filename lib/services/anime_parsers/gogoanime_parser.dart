@@ -93,7 +93,7 @@ class GogoanimeParser extends BaseParser {
   }
 
   @override
-  Future<Episode> getViewerInfo(Episode episode) async {
+  Future<Episode> getViewerInfo(Episode episode, [EntryInfo? info]) async {
     if (await webScraper.loadWebPage(episode.link)) {
       final serversList = webScraper.getElement(
           'div.anime_video_body > div.anime_muti_link > ul > li > a',

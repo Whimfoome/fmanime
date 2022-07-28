@@ -4,9 +4,11 @@ import 'package:fmanime/services/manga_parsers/mangasee_parser.dart';
 import 'package:photo_view/photo_view.dart';
 
 class MangaReader extends StatefulWidget {
-  const MangaReader({Key? key, required this.episode}) : super(key: key);
+  const MangaReader({Key? key, required this.episode, required this.entryInfo})
+      : super(key: key);
 
   final Episode episode;
+  final EntryInfo entryInfo;
 
   @override
   State<MangaReader> createState() => _MangaReaderState();
@@ -28,7 +30,8 @@ class _MangaReaderState extends State<MangaReader> {
   }
 
   void fetchPages() async {
-    var newEpisode = await MangaSeeParser().getViewerInfo(widget.episode);
+    var newEpisode =
+        await MangaSeeParser().getViewerInfo(widget.episode, widget.entryInfo);
 
     List<dynamic> newPages = newEpisode.servers;
 
@@ -184,8 +187,7 @@ class _MangaReaderState extends State<MangaReader> {
     );
 
     return AppBar(
-      title:
-          chapterAndPageVisible ? Text('Chapter ${widget.episode.name}') : null,
+      title: chapterAndPageVisible ? Text(widget.episode.name) : null,
       backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
       centerTitle: true,
       primary: true,
