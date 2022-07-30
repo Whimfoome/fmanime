@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/base_parser.dart';
-import 'package:fmanime/ui/pages/anime_viewer.dart';
-import 'package:fmanime/ui/pages/manga_reader.dart';
+import 'package:fmanime/ui/widgets/episode_list.dart';
 import 'package:fmanime/utils/content_type.dart' as contype;
 
 class DetailPage extends StatefulWidget {
@@ -55,59 +54,32 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        scrollDirection: Axis.vertical,
-        children: [
-          buildHeader(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: loadingText(),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
+            child: buildHeader(),
+          ),
+          // -------------------- //
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: loadingText(),
+              ),
             ),
           ),
-          const Divider(
-            height: 1,
+          // -------------------- //
+          const SliverToBoxAdapter(
+            child: Divider(height: 1),
           ),
-          buildContents(),
+          // -------------------- //
+          EpisodeList(
+            entryInfo: info,
+            contentType: widget.contentType,
+          ),
         ],
       ),
     );
-  }
-
-  Widget buildContents() {
-    if (info.episodes.isNotEmpty) {
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: const ClampingScrollPhysics(),
-        padding: EdgeInsets.zero,
-        scrollDirection: Axis.vertical,
-        itemCount: info.episodes.length,
-        itemBuilder: ((context, index) {
-          return ListTile(
-            title: episodeName(index),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      widget.contentType == contype.ContentType.anime
-                          ? AnimeViewer(episode: info.episodes[index])
-                          : MangaReader(
-                              episode: info.episodes[index],
-                              entryInfo: info,
-                            ),
-                ),
-              );
-            },
-          );
-        }),
-      );
-    } else {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
   }
 
   Widget buildHeader() {
@@ -185,12 +157,5 @@ class _DetailPageState extends State<DetailPage> {
     return Text(info.episodes.isNotEmpty
         ? '${info.episodes.length} $contentName'
         : 'Loading $contentName...');
-  }
-
-  Text episodeName(int index) {
-    final contentName =
-        widget.contentType == contype.ContentType.anime ? 'Episode' : '';
-
-    return Text('$contentName ${info.episodes[index].name}');
   }
 }

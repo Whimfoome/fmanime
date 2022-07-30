@@ -140,7 +140,6 @@ class MangaSeeParser extends BaseParser {
         String pageUrl =
             'https://$pathName/manga/${info.link}/$directory$paddedChapterNumber-$paddedPageNumber.png';
 
-        print(pageUrl);
         pagesList.add(pageUrl);
       }
     }
