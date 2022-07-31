@@ -119,9 +119,8 @@ class MangaSeeParser extends BaseParser {
 
     if (await webScraper.loadWebPage(episode.link)) {
       // Get server url
-      Map<String, dynamic> elementsServer =
-          webScraper.getScriptVariables(['vm.CurPathName']);
-      String scrapedStringServer = elementsServer['vm.CurPathName'][0]
+      String scrapedStringServer = webScraper
+          .getFirstScriptVariable('vm.CurPathName')
           .replaceAll('vm.CurPathName = ', '');
       String responseServer =
           scrapedStringServer.substring(1, scrapedStringServer.length - 2);
@@ -150,9 +149,9 @@ class MangaSeeParser extends BaseParser {
   }
 
   dynamic varToJson(String varName) {
-    Map<String, dynamic> elements = webScraper.getScriptVariables([varName]);
-
-    String scrapedString = elements[varName][0].replaceAll('$varName = ', '');
+    String scrapedString = webScraper
+        .getFirstScriptVariable(varName)
+        .replaceAll('$varName = ', '');
 
     String response = scrapedString.substring(0, scrapedString.length - 1);
 

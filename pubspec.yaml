@@ -14,7 +14,10 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   webview_flutter: ^3.0.4
-  web_scraper: ^0.1.4
+  web_scraper:
+    git:
+      url: https://github.com/Whimfoome/web_scraper.git
+      ref: overflowregexp
   photo_view: ^0.14.0
 
 dev_dependencies:
