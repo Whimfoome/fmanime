@@ -82,7 +82,7 @@ class GogoanimeParser extends BaseParser {
         String epHref = hrefElements[i]['attributes']['href'] as String;
         epHref = epHref.trim();
 
-        final episode = Episode(link: epHref, name: epName);
+        final episode = Episode(link: epHref, name: 'Episode $epName');
         fetchedEpisodes.add(episode);
       }
     }

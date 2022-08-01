@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/manga_parsers/mangasee_parser.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 class MangaReader extends StatefulWidget {
   const MangaReader({Key? key, required this.episode, required this.entryInfo})
@@ -21,6 +22,7 @@ class _MangaReaderState extends State<MangaReader> {
   bool appBarVisible = true;
   bool chapterAndPageVisible = true;
   bool loading = true;
+  List<NetworkImage> images = [];
 
   @override
   void initState() {
@@ -34,6 +36,10 @@ class _MangaReaderState extends State<MangaReader> {
         await MangaSeeParser().getViewerInfo(widget.episode, widget.entryInfo);
 
     List<dynamic> newPages = newEpisode.servers;
+
+    for (var page in newPages) {
+      images.add(NetworkImage(page));
+    }
 
     setState(() {
       pages = newPages;
@@ -64,73 +70,27 @@ class _MangaReaderState extends State<MangaReader> {
   }
 
   Widget buildCarousel(BuildContext context) {
-    return Center(
-        child: PageView.builder(
-      // store this controller in a State to save the carousel scroll position
-      controller: PageController(viewportFraction: 1, initialPage: 1),
-      onPageChanged: (value) => setCurrentPage(value),
+    return PhotoViewGallery.builder(
+      scrollPhysics: const BouncingScrollPhysics(),
+      reverse: true,
+      itemCount: length,
+      builder: (context, index) {
+        cacheNextImage(index);
 
-      itemCount: length + 2,
-      itemBuilder: (BuildContext context, int itemIndex) {
-        return buildCarouselItem(context, itemIndex);
+        return PhotoViewGalleryPageOptions(
+          imageProvider: images[index],
+          initialScale: PhotoViewComputedScale.contained * 1.0,
+          minScale: PhotoViewComputedScale.contained * 1.0,
+          maxScale: PhotoViewComputedScale.covered * 1.5,
+        );
       },
-    ));
+      onPageChanged: (index) => setCurrentPage(index + 1),
+    );
   }
 
-  Widget buildCarouselItem(BuildContext context, int itemIndex) {
-    if (itemIndex == 0) {
-      // Go to previous chapter page
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextButton(
-              onPressed: () => print('Go to previous chapter'), // TODO
-              child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.arrow_back, size: 25),
-                    VerticalDivider(
-                      width: 10,
-                    ),
-                    Text(
-                      "Previous Chapter",
-                      style: TextStyle(fontSize: 17.0),
-                    ),
-                  ])),
-        ],
-      );
-    } else if (itemIndex == length + 1) {
-      // Go to next chapter page
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextButton(
-              onPressed: () => print('Go to next chapter'), // TODO
-              child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      "Next Chapter",
-                      style: TextStyle(fontSize: 17.0),
-                    ),
-                    VerticalDivider(
-                      width: 10,
-                    ),
-                    Icon(Icons.arrow_forward, size: 25),
-                  ]))
-        ],
-      );
-    } else {
-      // Manga Page
-      return Padding(
-          padding: const EdgeInsets.all(1),
-          child: PhotoView(
-            minScale: PhotoViewComputedScale.contained * 1,
-            maxScale: PhotoViewComputedScale.contained * 2.5,
-            imageProvider: NetworkImage(pages[itemIndex - 1]),
-          ));
+  Future cacheNextImage(int index) async {
+    if (index < images.length - 1) {
+      precacheImage(images[index + 1], context);
     }
   }
 

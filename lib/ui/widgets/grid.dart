@@ -57,22 +57,27 @@ class _GridLibraryState extends State<GridLibrary> {
     _scrollController.dispose();
   }
 
-  GridView buildGrid() {
-    return GridView.builder(
+  CustomScrollView buildGrid() {
+    return CustomScrollView(
       controller: _scrollController,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.7,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-      ),
-      padding: const EdgeInsets.all(5),
-      itemBuilder: ((context, index) {
-        final item = items[index];
+      slivers: [
+        SliverGrid(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final item = items[index];
 
-        return buildGridTile(item);
-      }),
-      itemCount: items.length,
+              return buildGridTile(item);
+            },
+            childCount: items.length,
+          ),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.7,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+          ),
+        ),
+      ],
     );
   }
 

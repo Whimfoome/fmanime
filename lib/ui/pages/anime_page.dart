@@ -26,7 +26,7 @@ class _AnimePageState extends State<AnimePage> {
             ),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.explore),
       ),
     );
   }

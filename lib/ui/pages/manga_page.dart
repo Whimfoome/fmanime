@@ -26,7 +26,7 @@ class _MangaPageState extends State<MangaPage> {
             ),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.explore),
       ),
     );
   }

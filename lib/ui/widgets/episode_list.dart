@@ -35,6 +35,7 @@ class EpisodeList extends StatelessWidget {
               },
             );
           },
+          childCount: entryInfo.episodes.length,
         ),
       );
     } else {
@@ -47,9 +48,6 @@ class EpisodeList extends StatelessWidget {
   }
 
   Text episodeName(int index) {
-    final contentName =
-        contentType == contype.ContentType.anime ? 'Episode' : '';
-
-    return Text('$contentName ${entryInfo.episodes[index].name}');
+    return Text(entryInfo.episodes[index].name);
   }
 }
