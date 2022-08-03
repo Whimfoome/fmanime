@@ -96,10 +96,7 @@ class MangaSeeParser extends BaseParser {
         splittedName.last = removeNumberPad(splittedName.last);
         name = splittedName.join(' ');
 
-        String url =
-            '/read-online/${info.link}${chapterURLEncode(indexChapter)}';
-
-        final chapter = Episode(link: url, name: name);
+        final chapter = Episode(link: indexChapter, name: name);
         fetchedEpisodes.add(chapter);
       }
 
@@ -117,7 +114,10 @@ class MangaSeeParser extends BaseParser {
       return episode;
     }
 
-    if (await webScraper.loadWebPage(episode.link)) {
+    String episodeUrl =
+        '/read-online/${info.link}${chapterURLEncode(episode.link)}';
+
+    if (await webScraper.loadWebPage(episodeUrl)) {
       // Get server url
       String scrapedStringServer = webScraper
           .getFirstScriptVariable('vm.CurPathName')
@@ -129,7 +129,8 @@ class MangaSeeParser extends BaseParser {
 
       // Create Chapter items and add them to the list
       String pathName = responseServer;
-      String paddedChapterNumber = addNumberPad(episode.name.split(' ').last);
+      String paddedChapterNumber =
+          addNumberPad(chapterURLEncode(episode.link, true));
       String directory = jsonResponse['Directory'].length > 0
           ? jsonResponse['Directory'] + '/'
           : '';
@@ -176,7 +177,7 @@ class MangaSeeParser extends BaseParser {
     }
   }
 
-  String chapterURLEncode(String e) {
+  String chapterURLEncode(String e, [bool onlyNumber = false]) {
     var index = '';
     final t = int.parse(e.substring(0, 1));
 
@@ -203,7 +204,11 @@ class MangaSeeParser extends BaseParser {
       suffix = '.$path';
     }
 
-    return '-chapter-$n$suffix$index.html';
+    if (onlyNumber) {
+      return '$n$suffix';
+    } else {
+      return '-chapter-$n$suffix$index.html';
+    }
   }
 
   // 0005 -> 5
