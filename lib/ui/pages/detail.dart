@@ -76,6 +76,7 @@ class _DetailPageState extends State<DetailPage> {
           EpisodeList(
             entryInfo: info,
             contentType: widget.contentType,
+            updatedEpisodeIndex: updatedEpisodeIndex,
           ),
         ],
       ),
@@ -157,5 +158,11 @@ class _DetailPageState extends State<DetailPage> {
     return Text(info.episodes.isNotEmpty
         ? '${info.episodes.length} $contentName'
         : 'Loading $contentName...');
+  }
+
+  void updatedEpisodeIndex(int index, bool value) {
+    setState(() {
+      info.episodes[index].read = value;
+    });
   }
 }

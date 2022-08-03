@@ -5,17 +5,23 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 class MangaReader extends StatefulWidget {
-  const MangaReader({Key? key, required this.episode, required this.entryInfo})
+  const MangaReader(
+      {Key? key,
+      required this.entryInfo,
+      required this.epIndex,
+      required this.updatedEpisodeIndex})
       : super(key: key);
 
-  final Episode episode;
+  final int epIndex;
   final EntryInfo entryInfo;
+  final Function updatedEpisodeIndex;
 
   @override
   State<MangaReader> createState() => _MangaReaderState();
 }
 
 class _MangaReaderState extends State<MangaReader> {
+  late Episode episode;
   int length = 0;
   int currentPage = 1;
   late List<dynamic> pages;
@@ -28,12 +34,14 @@ class _MangaReaderState extends State<MangaReader> {
   void initState() {
     super.initState();
 
+    episode = widget.entryInfo.episodes[widget.epIndex];
+
     fetchPages();
   }
 
   void fetchPages() async {
     var newEpisode =
-        await MangaSeeParser().getViewerInfo(widget.episode, widget.entryInfo);
+        await MangaSeeParser().getViewerInfo(episode, widget.entryInfo);
 
     List<dynamic> newPages = newEpisode.servers;
 
@@ -95,19 +103,14 @@ class _MangaReaderState extends State<MangaReader> {
   }
 
   void setCurrentPage(int page) {
-    if (page == 0 || page == length + 1) {
-      if (page == length + 1) {
-        // TODO Set current chapter as read
-      }
-      setState(() {
-        chapterAndPageVisible = false;
-      });
-    } else {
-      setState(() {
-        currentPage = page;
-        chapterAndPageVisible = true;
-      });
+    if (page == length) {
+      widget.updatedEpisodeIndex(widget.epIndex, true);
     }
+
+    setState(() {
+      currentPage = page;
+      chapterAndPageVisible = true;
+    });
   }
 
   Widget buildLoading(BuildContext context) {
@@ -147,7 +150,7 @@ class _MangaReaderState extends State<MangaReader> {
     );
 
     return AppBar(
-      title: chapterAndPageVisible ? Text(widget.episode.name) : null,
+      title: chapterAndPageVisible ? Text(episode.name) : null,
       backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
       centerTitle: true,
       primary: true,

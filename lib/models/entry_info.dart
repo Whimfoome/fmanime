@@ -18,6 +18,7 @@ class Episode {
 
   String name;
   String link;
+  bool read = false;
 
   List<String> servers = [];
 }
