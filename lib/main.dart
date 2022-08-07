@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/ui/pages/anime_page.dart';
 import 'package:fmanime/ui/pages/manga_page.dart';
+import 'package:fmanime/utils/boxes.dart';
 import 'package:fmanime/utils/theme.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
-  await Hive.initFlutter();
+  await Boxes.initializeBoxes();
 
   runApp(const MyApp());
 }
@@ -40,7 +39,7 @@ class _NavBarState extends State<NavBar> {
   final screens = [
     const AnimePage(),
     const MangaPage(),
-    const Center(child: Text('Settings')),
+    //const Center(child: Text('Settings')),
   ];
 
   void updateIndex(int index) {
@@ -73,10 +72,10 @@ class _NavBarState extends State<NavBar> {
           icon: Icon(Icons.book),
           label: 'Manga',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
-        ),
+        // BottomNavigationBarItem(
+        //   icon: Icon(Icons.settings),
+        //   label: 'Settings',
+        // ),
       ],
     );
   }

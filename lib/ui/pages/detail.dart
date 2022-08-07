@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/widgets/episode_list.dart';
+import 'package:fmanime/utils/boxes.dart';
 import 'package:fmanime/utils/content_type.dart' as contype;
+import 'package:hive/hive.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage(
@@ -27,9 +29,15 @@ class _DetailPageState extends State<DetailPage> {
   void initState() {
     super.initState();
 
-    info = widget.info;
+    final boxEntries = getBox();
+    final foundEntry = boxEntries.get(widget.info.link!);
 
-    showDetails();
+    if (foundEntry != null) {
+      info = foundEntry;
+    } else {
+      info = widget.info;
+      showDetails();
+    }
   }
 
   Future showDetails() async {
@@ -53,7 +61,26 @@ class _DetailPageState extends State<DetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  info.favorite = !info.favorite;
+                });
+
+                final box = getBox();
+                if (info.favorite) {
+                  box.put(info.link, info);
+                } else {
+                  box.delete(info.link);
+                }
+              },
+              icon: info.favorite
+                  ? const Icon(Icons.favorite)
+                  : const Icon(Icons.favorite_border)),
+        ],
+      ),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverToBoxAdapter(
@@ -164,5 +191,14 @@ class _DetailPageState extends State<DetailPage> {
     setState(() {
       info.episodes[index].read = value;
     });
+
+    final box = getBox();
+    box.put(info.link, info);
+  }
+
+  Box<EntryInfo> getBox() {
+    return widget.contentType == contype.ContentType.anime
+        ? Boxes.getAnimeEntries()
+        : Boxes.getMangaEntries();
   }
 }

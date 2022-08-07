@@ -62,3 +62,42 @@ class EntryInfoAdapter extends TypeAdapter<EntryInfo> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class EpisodeAdapter extends TypeAdapter<Episode> {
+  @override
+  final int typeId = 1;
+
+  @override
+  Episode read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return Episode(
+      link: fields[1] as String,
+      name: fields[0] as String,
+    )..read = fields[2] as bool;
+  }
+
+  @override
+  void write(BinaryWriter writer, Episode obj) {
+    writer
+      ..writeByte(3)
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.link)
+      ..writeByte(2)
+      ..write(obj.read);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EpisodeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

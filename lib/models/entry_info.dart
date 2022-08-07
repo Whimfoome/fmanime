@@ -36,11 +36,17 @@ class EntryInfo extends HiveObject {
   String? getTitle() => name;
 }
 
-class Episode {
+@HiveType(typeId: 1)
+class Episode extends HiveObject {
   Episode({required this.link, required this.name});
 
+  @HiveField(0)
   String name;
+
+  @HiveField(1)
   String link;
+
+  @HiveField(2)
   bool read = false;
 
   List<String> servers = [];
