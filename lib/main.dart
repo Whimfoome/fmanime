@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fmanime/ui/pages/anime_page.dart';
 import 'package:fmanime/ui/pages/manga_page.dart';
 import 'package:fmanime/utils/theme.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+
   runApp(const MyApp());
 }
 

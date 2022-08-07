@@ -35,6 +35,7 @@ class GogoanimeParser extends BaseParser {
         entryInfo.name = urlElements[i]['title'];
         entryInfo.link = urlElements[i]['attributes']['href'];
         entryInfo.coverImage = imageElements[i]['attributes']['src'];
+        entryInfo.provider = 'Gogoanime';
 
         list.add(entryInfo);
       }
