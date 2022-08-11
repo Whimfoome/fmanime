@@ -36,26 +36,22 @@ class _DetailPageState extends State<DetailPage> {
       info = foundEntry;
     } else {
       info = widget.info;
-      showDetails();
+      showDetails(info).then((value) {
+        setState(() {
+          info = value;
+        });
+      });
     }
   }
 
-  Future showDetails() async {
-    await widget.parser.getDetailsData(info).then((value) {
-      if (value != null) {
-        setState(() {
-          info = value;
-        });
-      }
-    });
+  Future<EntryInfo> showDetails(EntryInfo entryInfo) async {
+    EntryInfo? newInfo;
 
-    widget.parser.getContentData(info).then((value) {
-      if (value != null) {
-        setState(() {
-          info = value;
-        });
-      }
-    });
+    newInfo = await widget.parser.getDetailsData(entryInfo);
+
+    newInfo = await widget.parser.getContentData(newInfo!);
+
+    return newInfo!;
   }
 
   @override
@@ -81,31 +77,34 @@ class _DetailPageState extends State<DetailPage> {
                   : const Icon(Icons.favorite_border)),
         ],
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverToBoxAdapter(
-            child: buildHeader(),
-          ),
-          // -------------------- //
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: loadingText(),
+      body: RefreshIndicator(
+        onRefresh: () async => refreshDetails(info),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: buildHeader(),
+            ),
+            // -------------------- //
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: loadingText(),
+                ),
               ),
             ),
-          ),
-          // -------------------- //
-          const SliverToBoxAdapter(
-            child: Divider(height: 1),
-          ),
-          // -------------------- //
-          EpisodeList(
-            entryInfo: info,
-            contentType: widget.contentType,
-            updatedEpisodeIndex: updatedEpisodeIndex,
-          ),
-        ],
+            // -------------------- //
+            const SliverToBoxAdapter(
+              child: Divider(height: 1),
+            ),
+            // -------------------- //
+            EpisodeList(
+              entryInfo: info,
+              contentType: widget.contentType,
+              updatedEpisodeIndex: updatedEpisodeIndex,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -200,5 +199,28 @@ class _DetailPageState extends State<DetailPage> {
     return widget.contentType == contype.ContentType.anime
         ? Boxes.getAnimeEntries()
         : Boxes.getMangaEntries();
+  }
+
+  Future refreshDetails(EntryInfo oldInfo) async {
+    var readEpisodes = [];
+
+    for (var episode in oldInfo.episodes) {
+      if (episode.read == true) {
+        readEpisodes.add(episode.link);
+      }
+    }
+
+    var newInfo = await showDetails(oldInfo);
+
+    var shouldRead = newInfo.episodes
+        .where((element) => readEpisodes.contains(element.link));
+
+    for (var episode in shouldRead) {
+      episode.read = true;
+    }
+
+    setState(() {
+      info = newInfo;
+    });
   }
 }

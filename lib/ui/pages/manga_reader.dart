@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/manga_parsers/mangasee_parser.dart';
 import 'package:photo_view/photo_view.dart';
@@ -37,6 +38,17 @@ class _MangaReaderState extends State<MangaReader> {
     episode = widget.entryInfo.episodes[widget.epIndex];
 
     fetchPages();
+
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
+        overlays: []);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
+
+    super.dispose();
   }
 
   void fetchPages() async {
@@ -58,20 +70,22 @@ class _MangaReaderState extends State<MangaReader> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.black,
-      appBar: appBarVisible ? buildAppBar(context) : null,
-      body: GestureDetector(
-        onTap: () => setState(() {
-          appBarVisible = !appBarVisible;
-        }),
-        child: Column(
-          children: [
-            Expanded(
-              child: loading ? buildLoading(context) : buildCarousel(context),
-            )
-          ],
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.black,
+        appBar: appBarVisible ? buildAppBar(context) : null,
+        body: GestureDetector(
+          onTap: () => setState(() {
+            appBarVisible = !appBarVisible;
+          }),
+          child: Column(
+            children: [
+              Expanded(
+                child: loading ? buildLoading(context) : buildCarousel(context),
+              )
+            ],
+          ),
         ),
       ),
     );
