@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/widgets/episode_list.dart';
+import 'package:fmanime/utils/boxes.dart';
 import 'package:fmanime/utils/content_type.dart' as contype;
+import 'package:hive/hive.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage(
@@ -27,58 +29,82 @@ class _DetailPageState extends State<DetailPage> {
   void initState() {
     super.initState();
 
-    info = widget.info;
+    final boxEntries = getBox();
+    final foundEntry = boxEntries.get(widget.info.link!);
 
-    showDetails();
+    if (foundEntry != null) {
+      info = foundEntry;
+    } else {
+      info = widget.info;
+      showDetails(info).then((value) {
+        setState(() {
+          info = value;
+        });
+      });
+    }
   }
 
-  Future showDetails() async {
-    await widget.parser.getDetailsData(info).then((value) {
-      if (value != null) {
-        setState(() {
-          info = value;
-        });
-      }
-    });
+  Future<EntryInfo> showDetails(EntryInfo entryInfo) async {
+    EntryInfo? newInfo;
 
-    widget.parser.getContentData(info).then((value) {
-      if (value != null) {
-        setState(() {
-          info = value;
-        });
-      }
-    });
+    newInfo = await widget.parser.getDetailsData(entryInfo);
+
+    newInfo = await widget.parser.getContentData(newInfo!);
+
+    return newInfo!;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverToBoxAdapter(
-            child: buildHeader(),
-          ),
-          // -------------------- //
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: loadingText(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  info.favorite = !info.favorite;
+                });
+
+                final box = getBox();
+                if (info.favorite) {
+                  box.put(info.link, info);
+                } else {
+                  box.delete(info.link);
+                }
+              },
+              icon: info.favorite
+                  ? const Icon(Icons.favorite)
+                  : const Icon(Icons.favorite_border)),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async => refreshDetails(info),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: buildHeader(),
+            ),
+            // -------------------- //
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: loadingText(),
+                ),
               ),
             ),
-          ),
-          // -------------------- //
-          const SliverToBoxAdapter(
-            child: Divider(height: 1),
-          ),
-          // -------------------- //
-          EpisodeList(
-            entryInfo: info,
-            contentType: widget.contentType,
-            updatedEpisodeIndex: updatedEpisodeIndex,
-          ),
-        ],
+            // -------------------- //
+            const SliverToBoxAdapter(
+              child: Divider(height: 1),
+            ),
+            // -------------------- //
+            EpisodeList(
+              entryInfo: info,
+              contentType: widget.contentType,
+              updatedEpisodeIndex: updatedEpisodeIndex,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -160,9 +186,55 @@ class _DetailPageState extends State<DetailPage> {
         : 'Loading $contentName...');
   }
 
-  void updatedEpisodeIndex(int index, bool value) {
+  void updatedEpisodeIndex(int index, bool value, [bool until = false]) {
+    if (until) {
+      var episodes = info.episodes;
+
+      for (var i = 0; i < episodes.length; i++) {
+        if (i <= index) {
+          episodes[i].read = value;
+        }
+      }
+
+      setState(() {
+        info.episodes = episodes;
+      });
+    } else {
+      setState(() {
+        info.episodes[index].read = value;
+      });
+    }
+
+    final box = getBox();
+    box.put(info.link, info);
+  }
+
+  Box<EntryInfo> getBox() {
+    return widget.contentType == contype.ContentType.anime
+        ? Boxes.getAnimeEntries()
+        : Boxes.getMangaEntries();
+  }
+
+  Future refreshDetails(EntryInfo oldInfo) async {
+    var readEpisodes = [];
+
+    for (var episode in oldInfo.episodes) {
+      if (episode.read == true) {
+        readEpisodes.add(episode.link);
+      }
+    }
+
+    var newInfo = await showDetails(oldInfo);
+
+    var shouldRead = newInfo.episodes
+        .where((element) => readEpisodes.contains(element.link));
+
+    for (var episode in shouldRead) {
+      episode.read = true;
+    }
+
     setState(() {
-      info.episodes[index].read = value;
+      info = newInfo;
     });
   }
 }

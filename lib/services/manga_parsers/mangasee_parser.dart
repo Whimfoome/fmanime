@@ -55,6 +55,7 @@ class MangaSeeParser extends BaseParser {
         entryInfo.link = mangaObject['i'];
         entryInfo.coverImage =
             'https://temp.compsci88.com/cover/${mangaObject['i']}.jpg';
+        entryInfo.provider = 'MangaSee';
 
         list.add(entryInfo);
       }
