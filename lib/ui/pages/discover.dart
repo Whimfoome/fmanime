@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/services/base_parser.dart';
 import 'package:fmanime/ui/widgets/grid.dart';
-import 'package:fmanime/utils/content_type.dart';
 import 'package:fmanime/utils/content_type.dart' as contype;
 
 class Discover extends StatefulWidget {
   const Discover({Key? key, required this.contentType}) : super(key: key);
 
-  final ContentType contentType;
+  final contype.ContentType contentType;
 
   @override
   State<Discover> createState() => _DiscoverState();

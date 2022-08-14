@@ -43,12 +43,21 @@ class EpisodeList extends StatelessWidget {
       title: episodeName(index, isRead),
       trailing: PopupMenuButton(
         onSelected: (value) {
-          updatedEpisodeIndex(index, value);
+          if (value is List) {
+            updatedEpisodeIndex(index, value[0], value[1]);
+          } else {
+            updatedEpisodeIndex(index, value);
+          }
         },
         itemBuilder: (context) => [
           PopupMenuItem(
               value: !isRead,
               child: Text(isRead ? 'Mark as Unread' : 'Mark as Read')),
+          PopupMenuItem(
+              value: [!isRead, true],
+              child: Text(isRead
+                  ? 'Mark as Unread everything until now'
+                  : 'Mark as Read everything until now')),
         ],
       ),
       onTap: () {

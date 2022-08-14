@@ -186,10 +186,24 @@ class _DetailPageState extends State<DetailPage> {
         : 'Loading $contentName...');
   }
 
-  void updatedEpisodeIndex(int index, bool value) {
-    setState(() {
-      info.episodes[index].read = value;
-    });
+  void updatedEpisodeIndex(int index, bool value, [bool until = false]) {
+    if (until) {
+      var episodes = info.episodes;
+
+      for (var i = 0; i < episodes.length; i++) {
+        if (i <= index) {
+          episodes[i].read = value;
+        }
+      }
+
+      setState(() {
+        info.episodes = episodes;
+      });
+    } else {
+      setState(() {
+        info.episodes[index].read = value;
+      });
+    }
 
     final box = getBox();
     box.put(info.link, info);

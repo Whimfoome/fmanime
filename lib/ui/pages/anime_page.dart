@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/ui/pages/discover.dart';
+import 'package:fmanime/ui/widgets/grid.dart';
 import 'package:fmanime/utils/boxes.dart';
-import 'package:fmanime/utils/content_type.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:fmanime/utils/content_type.dart' as contype;
 
 class AnimePage extends StatefulWidget {
   const AnimePage({Key? key}) : super(key: key);
@@ -27,12 +28,17 @@ class _AnimePageState extends State<AnimePage> {
       body: ValueListenableBuilder<Box<EntryInfo>>(
         valueListenable: Boxes.getAnimeEntries().listenable(),
         builder: (context, value, child) {
-          final entry = value.values.toList().cast<EntryInfo>();
+          final entries = value.values.toList().cast<EntryInfo>();
 
-          if (entry.isNotEmpty) {
-            return Text(entry[0].name!);
+          if (entries.isNotEmpty) {
+            return GridLibrary(
+              urlQuery: '',
+              gridParser: contype.chooseProvider(contype.ContentType.anime),
+              customEntries: entries,
+              key: UniqueKey(),
+            );
           }
-          return Text('nothing here');
+          return const Center(child: Text('Empty...'));
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -42,7 +48,7 @@ class _AnimePageState extends State<AnimePage> {
             context,
             MaterialPageRoute(
               builder: (_) => const Discover(
-                contentType: ContentType.anime,
+                contentType: contype.ContentType.anime,
               ),
             ),
           );

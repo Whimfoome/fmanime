@@ -5,10 +5,14 @@ import 'package:fmanime/ui/pages/detail.dart';
 
 class GridLibrary extends StatefulWidget {
   const GridLibrary(
-      {Key? key, required this.urlQuery, required this.gridParser})
+      {Key? key,
+      required this.urlQuery,
+      required this.gridParser,
+      this.customEntries})
       : super(key: key);
   final BaseParser gridParser;
   final String? urlQuery;
+  final List<EntryInfo>? customEntries;
 
   @override
   State<GridLibrary> createState() => _GridLibraryState();
@@ -24,6 +28,11 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.customEntries != null) {
+      items = widget.customEntries!;
+      return;
+    }
 
     fetchData();
 
