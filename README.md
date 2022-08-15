@@ -1,16 +1,20 @@
-# Fmanime
-
+# Fmanime <img alt="Fmanime Showcase" src="https://user-images.githubusercontent.com/42871796/184596483-97a6cbec-8373-49fa-a57e-76a4e6a07b65.gif" align="right" width="221px">
 Fmanime is a cross-platform Japanese animation (Anime) and comics (Manga) player/reader. Built with Flutter, Dart.
 
 It scrapes data from popular anime and manga websites. You can add them to your library and track/sync changes with MyAnimeList. 
 
-## [TODO](https://github.com/Whimfoome/fmanime/projects/1)
-
-The app is in the prototype stage and almost nothings is working.
+The app is in the prototype stage. See [TODO](https://github.com/Whimfoome/fmanime/projects/1)
 
 What works:
-- Anime tab
-- Anime Player (WebView) (TODO: Integrated)
+- Home page for Anime and Manga
+- Discover Anime and Manga
+  - Providers: _Gogoanime_ and _MangaSee_
+- Saving
+- Anime Player (WebView)
+- Manga Rader
+
+What doesn't wok:
+- Sync with MyAnimeList
 
 ## Credits
 
