@@ -11,7 +11,7 @@ What works:
   - Providers: _Gogoanime_ and _MangaSee_
 - Saving
 - Anime Player (WebView)
-- Manga Rader
+- Manga Reader
 
 What doesn't wok:
 - Sync with MyAnimeList
