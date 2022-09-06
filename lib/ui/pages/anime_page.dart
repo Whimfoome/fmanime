@@ -28,7 +28,8 @@ class _AnimePageState extends State<AnimePage> {
       body: ValueListenableBuilder<Box<EntryInfo>>(
         valueListenable: Boxes.getAnimeEntries().listenable(),
         builder: (context, value, child) {
-          final entries = value.values.toList().cast<EntryInfo>();
+          final entries =
+              value.values.where((element) => element.favorite).toList();
 
           if (entries.isNotEmpty) {
             return GridLibrary(

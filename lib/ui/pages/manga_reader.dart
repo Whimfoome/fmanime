@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fmanime/models/entry_info.dart';
 import 'package:fmanime/services/manga_parsers/mangasee_parser.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
+import 'package:interactiveviewer_gallery/interactiveviewer_gallery.dart';
 
 class MangaReader extends StatefulWidget {
   const MangaReader(
@@ -26,7 +25,7 @@ class _MangaReaderState extends State<MangaReader> {
   int length = 0;
   int currentPage = 1;
   late List<dynamic> pages;
-  bool appBarVisible = true;
+  bool appBarVisible = false;
   bool chapterAndPageVisible = true;
   bool loading = true;
   List<NetworkImage> images = [];
@@ -61,6 +60,8 @@ class _MangaReaderState extends State<MangaReader> {
       images.add(NetworkImage(page));
     }
 
+    images = images.reversed.toList();
+
     setState(() {
       pages = newPages;
       length = newPages.length;
@@ -70,49 +71,61 @@ class _MangaReaderState extends State<MangaReader> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        backgroundColor: Colors.black,
-        appBar: appBarVisible ? buildAppBar(context) : null,
-        body: GestureDetector(
-          onTap: () => setState(() {
-            appBarVisible = !appBarVisible;
-          }),
-          child: Column(
-            children: [
-              Expanded(
-                child: loading ? buildLoading(context) : buildCarousel(context),
-              )
-            ],
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.black,
+      appBar: appBarVisible ? buildAppBar(context) : null,
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.transparent,
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            heightFactor: 0.0,
+            child: Text(
+              '$currentPage / $length',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
+        ),
+      ),
+      body: GestureDetector(
+        onTap: () => setState(() {
+          appBarVisible = !appBarVisible;
+        }),
+        child: Column(
+          children: [
+            Expanded(
+              child: loading ? buildLoading(context) : buildCarousel(context),
+            )
+          ],
         ),
       ),
     );
   }
 
   Widget buildCarousel(BuildContext context) {
-    return PhotoViewGallery.builder(
-      scrollPhysics: const BouncingScrollPhysics(),
-      reverse: true,
-      itemCount: length,
-      builder: (context, index) {
-        cacheNextImage(index);
-
-        return PhotoViewGalleryPageOptions(
-          imageProvider: images[index],
-          initialScale: PhotoViewComputedScale.contained * 1.0,
-          minScale: PhotoViewComputedScale.contained * 1.0,
-          maxScale: PhotoViewComputedScale.covered * 1.5,
-        );
+    return InteractiveviewerGallery(
+      sources: images,
+      initIndex: images.length - 1,
+      itemBuilder: ((context, index, _) {
+        return Center(
+            child: Image(
+          image: images[index],
+          fit: BoxFit.contain,
+        ));
+      }),
+      onPageChanged: (value) {
+        setCurrentPage(images.length - value);
+        cacheNextImage(value);
       },
-      onPageChanged: (index) => setCurrentPage(index + 1),
     );
   }
 
   Future cacheNextImage(int index) async {
-    if (index < images.length - 1) {
-      precacheImage(images[index + 1], context);
+    if (index > 0) {
+      precacheImage(images[index - 1], context);
     }
   }
 
@@ -141,34 +154,11 @@ class _MangaReaderState extends State<MangaReader> {
   }
 
   AppBar buildAppBar(BuildContext context) {
-    var appBarPadding = Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          RichText(
-              text: TextSpan(
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-            children: [
-              TextSpan(
-                  text: '$currentPage',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18.0,
-                  )),
-              TextSpan(text: ' / $length'),
-            ],
-          ))
-        ],
-      ),
-    );
-
     return AppBar(
       title: chapterAndPageVisible ? Text(episode.name) : null,
       backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.8),
       centerTitle: true,
       primary: true,
-      actions: chapterAndPageVisible ? [appBarPadding] : null,
     );
   }
 }

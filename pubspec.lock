@@ -284,6 +284,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.1"
+  interactiveviewer_gallery:
+    dependency: "direct main"
+    description:
+      name: interactiveviewer_gallery
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.0"
   io:
     dependency: transitive
     description:
@@ -410,15 +417,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
-  photo_view:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: fmanime
-      resolved-ref: b8aff767c136c67136c4c6adb4530c0986f697a5
-      url: "https://github.com/Whimfoome/photo_view.git"
-    source: git
-    version: "0.14.0"
   platform:
     dependency: transitive
     description:

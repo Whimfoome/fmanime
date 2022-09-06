@@ -28,7 +28,8 @@ class _MangaPageState extends State<MangaPage> {
       body: ValueListenableBuilder<Box<EntryInfo>>(
         valueListenable: Boxes.getMangaEntries().listenable(),
         builder: (context, value, child) {
-          final entries = value.values.toList().cast<EntryInfo>();
+          final entries =
+              value.values.where((element) => element.favorite).toList();
 
           if (entries.isNotEmpty) {
             return GridLibrary(

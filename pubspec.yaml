@@ -21,10 +21,7 @@ dependencies:
     git:
       url: https://github.com/Whimfoome/web_scraper.git
       ref: overflowregexp
-  photo_view:
-    git:
-      url: https://github.com/Whimfoome/photo_view.git
-      ref: fmanime
+  interactiveviewer_gallery: ^0.6.0
 
 dev_dependencies:
   flutter_test:
