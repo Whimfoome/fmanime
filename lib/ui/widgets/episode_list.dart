@@ -9,12 +9,14 @@ class EpisodeList extends StatelessWidget {
       {Key? key,
       required this.entryInfo,
       required this.contentType,
-      required this.updatedEpisodeIndex})
+      required this.updatedEpisodeIndex,
+      required this.showOnlyUnread})
       : super(key: key);
 
   final contype.ContentType contentType;
   final EntryInfo entryInfo;
   final Function updatedEpisodeIndex;
+  final bool showOnlyUnread;
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +38,12 @@ class EpisodeList extends StatelessWidget {
     }
   }
 
-  ListTile listTileItem(int index, BuildContext context) {
+  Widget listTileItem(int index, BuildContext context) {
     bool isRead = entryInfo.episodes[index].read;
+
+    if (showOnlyUnread && isRead) {
+      return const SizedBox.shrink();
+    }
 
     return ListTile(
       title: episodeName(index, isRead),

@@ -24,6 +24,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late EntryInfo info;
+  bool showOnlyUnread = true;
 
   @override
   void initState() {
@@ -94,8 +95,14 @@ class _DetailPageState extends State<DetailPage> {
                   Container(
                     alignment: Alignment.centerRight,
                     child: IconButton(
-                      onPressed: (() => print('a')),
-                      icon: const Icon(Icons.visibility),
+                      onPressed: (() {
+                        setState(() {
+                          showOnlyUnread = !showOnlyUnread;
+                        });
+                      }),
+                      icon: Icon(showOnlyUnread
+                          ? Icons.visibility_off
+                          : Icons.visibility),
                     ),
                   )
                 ],
@@ -110,6 +117,7 @@ class _DetailPageState extends State<DetailPage> {
               entryInfo: info,
               contentType: widget.contentType,
               updatedEpisodeIndex: updatedEpisodeIndex,
+              showOnlyUnread: showOnlyUnread,
             ),
           ],
         ),
