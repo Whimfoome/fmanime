@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
+import 'package:fmanime/route_generator.dart';
 import 'package:fmanime/services/base_parser.dart';
-import 'package:fmanime/ui/pages/detail.dart';
 
 class GridLibrary extends StatefulWidget {
   const GridLibrary(
@@ -63,6 +63,7 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void dispose() {
     super.dispose();
+    print('ola');
     _scrollController.dispose();
   }
 
@@ -134,14 +135,12 @@ class _GridLibraryState extends State<GridLibrary> {
           ),
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DetailPage(
-                info: item,
-                parser: widget.gridParser,
-                contentType: widget.gridParser.contentType,
-              ),
+          Navigator.of(context).pushNamed(
+            '/details',
+            arguments: DetailsRouteArgs(
+              item,
+              widget.gridParser,
+              widget.gridParser.contentType,
             ),
           );
         },

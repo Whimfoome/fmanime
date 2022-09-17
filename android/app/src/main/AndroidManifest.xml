@@ -2,7 +2,7 @@
     package="me.whimfoome.fmanime">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="fmanime"
+        android:label="Fmanime"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

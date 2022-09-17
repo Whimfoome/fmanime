@@ -1,5 +1,5 @@
 name: fmanime
-description: A new Flutter project.
+description: Manga reader and Anime player app.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
