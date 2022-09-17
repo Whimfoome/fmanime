@@ -63,7 +63,6 @@ class _GridLibraryState extends State<GridLibrary> {
   @override
   void dispose() {
     super.dispose();
-    print('ola');
     _scrollController.dispose();
   }
 
