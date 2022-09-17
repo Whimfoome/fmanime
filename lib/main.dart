@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fmanime/route_generator.dart';
 import 'package:fmanime/ui/pages/anime_page.dart';
 import 'package:fmanime/ui/pages/manga_page.dart';
 import 'package:fmanime/utils/boxes.dart';
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
       title: 'Fmanime',
       darkTheme: appTheme(),
       themeMode: ThemeMode.dark,
-      home: const NavBar(title: 'Fmanime'),
+      initialRoute: '/',
+      onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
 }

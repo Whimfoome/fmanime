@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
-import 'package:fmanime/ui/pages/anime_viewer.dart';
-import 'package:fmanime/ui/pages/manga_reader.dart';
+import 'package:fmanime/route_generator.dart';
 import 'package:fmanime/utils/content_type.dart' as contype;
 
 class EpisodeList extends StatelessWidget {
@@ -67,18 +66,17 @@ class EpisodeList extends StatelessWidget {
         ],
       ),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => contentType == contype.ContentType.anime
-                ? AnimeViewer(episode: entryInfo.episodes[index])
-                : MangaReader(
-                    entryInfo: entryInfo,
-                    epIndex: index,
-                    updatedEpisodeIndex: updatedEpisodeIndex,
-                  ),
-          ),
-        );
+        if (contentType == contype.ContentType.anime) {
+          Navigator.of(context).pushNamed(
+            '/watch',
+            arguments: entryInfo.episodes[index],
+          );
+        } else {
+          Navigator.of(context).pushNamed(
+            '/read',
+            arguments: ReadRouteArgs(entryInfo, index, updatedEpisodeIndex),
+          );
+        }
       },
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
-import 'package:fmanime/ui/pages/discover.dart';
 import 'package:fmanime/ui/widgets/grid.dart';
 import 'package:fmanime/utils/boxes.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -45,13 +44,9 @@ class _AnimePageState extends State<AnimePage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'discover_anime_btn',
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const Discover(
-                contentType: contype.ContentType.anime,
-              ),
-            ),
+          Navigator.of(context).pushNamed(
+            '/discover',
+            arguments: contype.ContentType.anime,
           );
         },
         child: const Icon(Icons.explore),

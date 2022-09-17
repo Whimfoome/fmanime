@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fmanime/models/entry_info.dart';
-import 'package:fmanime/ui/pages/discover.dart';
 import 'package:fmanime/ui/widgets/grid.dart';
 import 'package:fmanime/utils/boxes.dart';
 import 'package:fmanime/utils/content_type.dart' as contype;
@@ -45,13 +44,9 @@ class _MangaPageState extends State<MangaPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'discover_manga_btn',
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const Discover(
-                contentType: contype.ContentType.manga,
-              ),
-            ),
+          Navigator.of(context).pushNamed(
+            '/discover',
+            arguments: contype.ContentType.manga,
           );
         },
         child: const Icon(Icons.explore),
