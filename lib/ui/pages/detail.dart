@@ -86,11 +86,19 @@ class _DetailPageState extends State<DetailPage> {
             ),
             // -------------------- //
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: loadingText(),
-                ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Center(child: loadingText()),
+                  ),
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      onPressed: (() => print('a')),
+                      icon: const Icon(Icons.visibility),
+                    ),
+                  )
+                ],
               ),
             ),
             // -------------------- //
